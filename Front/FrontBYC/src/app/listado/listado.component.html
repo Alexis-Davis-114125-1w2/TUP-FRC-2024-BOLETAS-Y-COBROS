@@ -1,37 +1,85 @@
-<div class="row justify-content-center">
-    <div class="col-6 text-center mb-4" style="border: 2px solid #007bff; border-radius: 10px; padding: 20px; background-color: #f8f9fa;">
-      <h4 class="mb-0" style="font-weight: bold; color: #007bff;">Total: $ {{ total | number:'1.2-2' }}</h4>
-    </div>
+<div class="container mt-4">
+  <div class="row justify-content-center">
+    @if (facturaActual) {
+      <div class="col-md-6 text-center mb-4">
+        <div class="card">
+          <div class="card-body">
+            <h4 class="card-title" style="color: #007bff;">Total a pagar: $ {{ facturaActual.monto | number:'1.2-2' }}</h4>
+          </div>
+        </div>
+      </div>
+    }
+
     <div class="col-md-12">
-      <table class="table table-bordered">
-        <thead>
-          <tr>
-            <th>Fecha de Emisión</th>
-            <th>Periodo</th>
-            <th>Monto</th>
-            <th>Lista</th>
-            <th>Estado</th>
-            <th>Ver Boleta</th>
-            <th>Pagar</th>
-          </tr>
-        </thead>
-        <tbody>
-          @for (boleta of boletas; track boleta.fechaEmision) {
+      <h5 class="mb-3">Factura actual</h5>
+      <div class="table-responsive">
+        <table class="table table-bordered table-hover">
+          <thead class="table-light">
             <tr>
-              <td>{{ boleta.fechaEmision | date:'dd/MM/yyyy' }}</td>
-              <td>{{ boleta.periodo }}</td>
-              <td>$ {{ boleta.monto | number:'1.2-2' }}</td>
-              <td>{{ boleta.lista }}</td>
-              <td>{{ boleta.estado }}</td>
-              <td><a [href]="boleta.urlBoleta" target="_blank" class="btn btn-primary">Ver Boleta</a></td>
-              <td><button [disabled]="boleta.estado === 'Pagado'" (click)="pagar(boleta.urlPago)" class="btn btn-success">Pagar</button></td>
+              <th>Fecha de Emisión</th>
+              <th>Periodo</th>
+              <th>Monto</th>
+              <th>Lista</th>
+              <th>Estado</th>
+              <th>Ver Boleta</th>
+              <th>Pagar</th>
             </tr>
-          } @empty {
+          </thead>
+          <tbody>
+            @if (facturaActual) {
+              <tr>
+                <td>{{ facturaActual.fechaEmision | date:'dd/MM/yyyy' }}</td>
+                <td>{{ facturaActual.periodo }}</td>
+                <td>$ {{ facturaActual.monto | number:'1.2-2' }}</td>
+                <td>{{ facturaActual.lista }}</td>
+                <td>{{ facturaActual.estado }}</td>
+                <td><a [href]="facturaActual.urlBoleta" target="_blank" class="btn btn-primary btn-sm">Ver Boleta</a></td>
+                <td><button (click)="pagar(facturaActual.urlPago)" class="btn btn-success btn-sm">Pagar</button></td>
+              </tr>
+            } @else {
+              <tr>
+                <td colspan="7" class="text-center">No hay facturas pendientes.</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+
+      <h5 class="mt-4 mb-3">Historial de facturas pagadas</h5>
+      <div class="table-responsive">
+        <table class="table table-bordered table-hover">
+          <thead class="table-light">
             <tr>
-              <td colspan="7" class="text-center">No hay boletas disponibles.</td>
+              <th>Fecha de Emisión</th>
+              <th>Periodo</th>
+              <th>Monto</th>
+              <th>Lista</th>
+              <th>Estado</th>
+              <th>Ver Boleta</th>
             </tr>
-          }
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            
+            @for (boleta of boletas; track boleta.fechaEmision) {
+              <tr>
+                <td>{{ boleta.fechaEmision | date:'dd/MM/yyyy' }}</td>
+                <td>{{ boleta.periodo }}</td>
+                <td>$ {{ boleta.monto | number:'1.2-2' }}</td>
+                <td>{{ boleta.lista }}</td>
+                <td>{{ boleta.estado }}</td>
+                <td><a [href]="boleta.urlBoleta" target="_blank" class="btn btn-primary btn-sm">Ver Boleta</a></td>
+              </tr>
+            } @empty {
+              <tr>
+                <td colspan="6" class="text-center">No hay facturas pagadas.</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+      <div class="text-end mt-3">
+        <h5>Total pagado: $ {{ totalPagado | number:'1.2-2' }}</h5>
+      </div>
     </div>
   </div>
+</div>

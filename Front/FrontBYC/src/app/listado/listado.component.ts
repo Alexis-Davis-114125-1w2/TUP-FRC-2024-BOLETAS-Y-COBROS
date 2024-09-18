@@ -20,21 +20,21 @@ interface Boleta {
 })
 export class ListadoComponent implements OnInit {
   boletas: Boleta[] = [];
-  total: number = 0;
+  facturaActual: Boleta | null = null;
+  totalPagado: number = 0;
 
   ngOnInit() {
     this.cargarBoletasEjemplo();
-    this.calcularTotal();
   }
 
   cargarBoletasEjemplo() {
-    this.boletas = [
+    const boletasNoPagadas: Boleta[] = [
       {
         fechaEmision: '2024-09-01',
         periodo: 'Septiembre 2024',
         monto: 5000,
         lista: 'Expensas',
-        estado: 'Pendiente',
+        estado: 'No Pagado',
         urlBoleta: 'https://ejemplo.com/boleta1',
         urlPago: 'https://www.mercadopago.com.ar'
       },
@@ -43,7 +43,7 @@ export class ListadoComponent implements OnInit {
         periodo: 'Agosto 2024',
         monto: 4800,
         lista: 'Expensas',
-        estado: 'Pagado',
+        estado: 'No Pagado',
         urlBoleta: 'https://ejemplo.com/boleta2',
         urlPago: 'https://www.mercadopago.com.ar'
       },
@@ -52,10 +52,13 @@ export class ListadoComponent implements OnInit {
         periodo: 'Julio 2024',
         monto: 4600,
         lista: 'Expensas',
-        estado: 'Pendiente',
+        estado: 'No Pagado',
         urlBoleta: 'https://ejemplo.com/boleta3',
         urlPago: 'https://www.mercadopago.com.ar'
-      },
+      }
+    ];
+
+    this.boletas = [
       {
         fechaEmision: '2024-06-01',
         periodo: 'Junio 2024',
@@ -70,15 +73,33 @@ export class ListadoComponent implements OnInit {
         periodo: 'Mayo 2024',
         monto: 4200,
         lista: 'Expensas',
-        estado: 'Pendiente',
+        estado: 'Pagado',
         urlBoleta: 'https://ejemplo.com/boleta5',
         urlPago: 'https://www.mercadopago.com.ar'
       }
     ];
+
+    this.calcularFacturaActual(boletasNoPagadas);
+    this.calcularTotalPagado();
   }
 
-  calcularTotal() {
-    this.total = this.boletas.reduce((sum, boleta) => sum + boleta.monto, 0);
+  calcularFacturaActual(boletasNoPagadas: Boleta[]) {
+    const totalNoPagado = boletasNoPagadas.reduce((sum, boleta) => sum + boleta.monto, 0);
+    const recargo = totalNoPagado * 0.05 * boletasNoPagadas.length;
+    const montoTotal = totalNoPagado + recargo;
+    this.facturaActual = {
+      fechaEmision: new Date().toISOString().split('T')[0],
+      periodo: 'Facturas pendientes',
+      monto: montoTotal,
+      lista: 'Expensas acumuladas',
+      estado: 'No Pagado',
+      urlBoleta: 'https://ejemplo.com/factura-actual',
+      urlPago: 'https://www.mercadopago.com.ar'
+    };
+  }
+
+  calcularTotalPagado() {
+    this.totalPagado = this.boletas.reduce((sum, boleta) => sum + boleta.monto, 0);
   }
 
   pagar(urlPago: string) {
