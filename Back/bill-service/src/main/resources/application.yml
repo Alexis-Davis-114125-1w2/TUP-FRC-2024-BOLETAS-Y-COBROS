@@ -1,6 +1,9 @@
 spring:
   application:
     name: bill-service
+    doc:
+      swagger-ui:
+        path: /documentacion
 
   datasource:
     url: jdbc:mysql://${MYSQL_HOST:localhost}:${MYSQL_PORT:3306}/${MYSQL_DATABASE:bill_db}

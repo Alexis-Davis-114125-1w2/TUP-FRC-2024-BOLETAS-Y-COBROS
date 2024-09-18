@@ -1,8 +1,10 @@
 package com.example.bill_service.controller;
 
+import com.example.bill_service.model.Bill;
 import com.example.bill_service.model.Owner;
 import com.example.bill_service.model.BillDetail;
 import com.example.bill_service.service.BillDetailService;
+import com.example.bill_service.service.BillService;
 import com.example.bill_service.service.OwnerService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -20,6 +22,20 @@ public class BillController {
 
     @Autowired
     private BillDetailService billDetailService;
+
+    @Autowired
+    private BillService billService;
+
+
+    @PostMapping("/bill")
+    public ResponseEntity<Bill> createBill(@RequestBody Bill bill) {
+        return ResponseEntity.ok(billService.saveBill(bill));
+    }
+
+    @GetMapping("/bill")
+    public ResponseEntity<List<Bill>> getAllBills() {
+        return ResponseEntity.ok(billService.getAllBills());
+    }
 
     // Endpoint para obtener información del propietario por ID
     @GetMapping("/owner/{id}")
