@@ -1,13 +1,14 @@
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
 import { RouterModule } from '@angular/router';
+import { ListadoComponent } from '../listado/listado.component';
 
 @Component({
   selector: 'app-inicio',
   standalone : true,
   templateUrl: './inicio.component.html',
   styleUrls: ['./inicio.component.css'],
-  imports: [RouterModule]
+  imports: [RouterModule, ListadoComponent]
 })
 
 export class InicioComponent {

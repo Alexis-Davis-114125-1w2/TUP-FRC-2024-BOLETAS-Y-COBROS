@@ -1,9 +1,9 @@
 import { Component } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { InicioComponent } from './inicio/inicio.component'; 
-import { ConsultarBoletasComponent } from './consultar-boletas/consultar-boletas.component';
 import { RouterModule } from '@angular/router';
 import { routes } from './app.routes';
+import { ListadoComponent } from './listado/listado.component';
 
 @Component({
   selector: 'app-root',
@@ -11,7 +11,7 @@ import { routes } from './app.routes';
   imports: [
     RouterOutlet
     , InicioComponent
-    , ConsultarBoletasComponent],
+    , ListadoComponent],
   templateUrl: './app.component.html',
   styleUrl: './app.component.css'
 })
