@@ -36,6 +36,7 @@ Este proyecto contiene el back-end para el sistema de Boletas y Cobros, compuest
 Los microservicios proporcionan endpoints REST para la emisión de boletas y gestión de cobros. Puedes acceder a la documentación de los endpoints en cada microservicio:
 
 Boletas Microservice: 
+
 Cobros Microservice: 
 
 ## Microservicios
