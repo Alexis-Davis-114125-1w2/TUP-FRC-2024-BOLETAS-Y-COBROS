@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
-import { RouterModule } from '@angular/router';
+
 import { ListadoComponent } from '../listado/listado.component';
 
 @Component({
@@ -8,7 +8,7 @@ import { ListadoComponent } from '../listado/listado.component';
   standalone : true,
   templateUrl: './inicio.component.html',
   styleUrls: ['./inicio.component.css'],
-  imports: [RouterModule, ListadoComponent]
+  imports: [ ListadoComponent]
 })
 
 export class InicioComponent {

@@ -1,42 +1,37 @@
 <div class="row justify-content-center">
-
     <div class="col-6 text-center mb-4" style="border: 2px solid #007bff; border-radius: 10px; padding: 20px; background-color: #f8f9fa;">
-        <h4 class="mb-0" style="font-weight: bold; color: #007bff;">Total: $ xxx</h4>
+      <h4 class="mb-0" style="font-weight: bold; color: #007bff;">Total: $ {{ total | number:'1.2-2' }}</h4>
     </div>
     <div class="col-md-12">
-        <table class="table table-bordered">
-            <thead>
-                <tr>
-                    <th>Fecha de Emisión</th>
-                    <th>Periodo</th>
-                    <th>Monto</th>
-                    <th>Lista</th>
-                    <th>Estado</th>
-                    <th>Ver Boleta</th>
-                    <th>Pagar</th>
-                </tr>
-            </thead>
-            <tbody>
-        <tr>
-            <td>01/09/2024</td>
-            <td>Agosto 2024</td>
-            <td>$ 5000</td>
-            <td>Expensas</td>
-            <td>Pendiente</td>
-            <td><button class="btn btn-primary">Ver Boleta</button></td>
-            <td><button class="btn btn-success">Pagar</button></td>
-        </tr>
-        <tr>
-            <td>01/08/2024</td>
-            <td>Julio 2024</td>
-            <td>$ 4500</td>
-            <td>Expensas</td>
-            <td>Pagado</td>
-            <td><button class="btn btn-primary">Ver Boleta</button></td>
-            <td><button class="btn btn-success" disabled>Pagar</button></td>
-        </tr>
-    </tbody>
-</table>
-</div>
-
-</div>
+      <table class="table table-bordered">
+        <thead>
+          <tr>
+            <th>Fecha de Emisión</th>
+            <th>Periodo</th>
+            <th>Monto</th>
+            <th>Lista</th>
+            <th>Estado</th>
+            <th>Ver Boleta</th>
+            <th>Pagar</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (boleta of boletas; track boleta.fechaEmision) {
+            <tr>
+              <td>{{ boleta.fechaEmision | date:'dd/MM/yyyy' }}</td>
+              <td>{{ boleta.periodo }}</td>
+              <td>$ {{ boleta.monto | number:'1.2-2' }}</td>
+              <td>{{ boleta.lista }}</td>
+              <td>{{ boleta.estado }}</td>
+              <td><a [href]="boleta.urlBoleta" target="_blank" class="btn btn-primary">Ver Boleta</a></td>
+              <td><button [disabled]="boleta.estado === 'Pagado'" (click)="pagar(boleta.urlPago)" class="btn btn-success">Pagar</button></td>
+            </tr>
+          } @empty {
+            <tr>
+              <td colspan="7" class="text-center">No hay boletas disponibles.</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  </div>
