@@ -1,4 +1,4 @@
-package com.example.boleta_service.entities;
+package com.example.bill_service.model;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
