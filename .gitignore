@@ -24,3 +24,5 @@ yarn-error.log*
 
 # Environment files
 .env
+
+Back/bill-service/mysql_data/mysql.sock

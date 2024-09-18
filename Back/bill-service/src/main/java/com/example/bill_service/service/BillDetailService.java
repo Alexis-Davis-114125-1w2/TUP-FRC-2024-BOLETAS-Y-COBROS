@@ -15,7 +15,7 @@ import java.util.List;
 public class BillDetailService {
 
     // URL base de la API
-    private static final String EXPENSE_API_URL = "https://my-json-server.typicode.com/405313-Almeida/fake-Api-2/listaDetalle";
+    private static final String EXPENSE_API_URL = "https://raw.githubusercontent.com/405313-Almeida/Fake_Api_Details/main/db.json";
 
     @Autowired
     private RestTemplate restTemplate;

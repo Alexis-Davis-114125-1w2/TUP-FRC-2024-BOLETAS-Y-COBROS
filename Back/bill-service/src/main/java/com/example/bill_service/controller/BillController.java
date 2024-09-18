@@ -1,11 +1,10 @@
 package com.example.bill_service.controller;
 
-import com.example.bill_service.model.Bill;
-import com.example.bill_service.model.Owner;
-import com.example.bill_service.model.BillDetail;
+import com.example.bill_service.model.*;
 import com.example.bill_service.service.BillDetailService;
 import com.example.bill_service.service.BillService;
 import com.example.bill_service.service.OwnerService;
+import com.example.bill_service.service.PaymentService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -26,6 +25,8 @@ public class BillController {
     @Autowired
     private BillService billService;
 
+    @Autowired
+    private PaymentService paymentService;
 
     @PostMapping("/bill")
     public ResponseEntity<Bill> createBill(@RequestBody Bill bill) {
@@ -64,4 +65,13 @@ public class BillController {
             return ResponseEntity.notFound().build();
         }
     }
+
+    // Endpoint para procesar el pago.
+    @PostMapping("/process-payment")
+    public ResponseEntity<PaymentResponse> processPayment(@RequestBody PaymentRequest paymentRequest) {
+        PaymentResponse response = paymentService.processPayment(paymentRequest);
+        return ResponseEntity.ok(response);
+    }
+
+
 }

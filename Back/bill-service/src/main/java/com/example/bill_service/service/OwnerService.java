@@ -8,7 +8,7 @@ import org.springframework.web.client.RestTemplate;
 @Service
 public class OwnerService {
 
-    private static final String OWNER_API_URL = "https://my-json-server.typicode.com/405313-Almeida/fake-Api-2/usuarios/";
+    private static final String OWNER_API_URL = "https://raw.githubusercontent.com/405313-Almeida/Fake_Api_Users/main/db.json";
 
     @Autowired
     private RestTemplate restTemplate;
