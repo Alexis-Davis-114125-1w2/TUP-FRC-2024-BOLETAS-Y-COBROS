@@ -38,7 +38,8 @@ En la interfaz podrás:
 - Gestionar pagos de manera interactiva.
 
 ## Captura de Pantalla
-Incluir imagen de como se ve la interfaz de la aplicacion.
+Imagen de ejemplo de como se vizualizaria:
+![ImagenEjemplo](https://github.com/user-attachments/assets/5dedec1c-6080-4594-aac2-0e6694204858)
 
 ## Tecnologias
 - Angular 18
