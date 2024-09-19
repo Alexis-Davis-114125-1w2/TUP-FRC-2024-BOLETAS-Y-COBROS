@@ -1,5 +1,6 @@
 package com.example.bill_service.controller;
 
+import com.example.bill_service.dto.BillDTO;
 import com.example.bill_service.model.*;
 import com.example.bill_service.service.BillDetailService;
 import com.example.bill_service.service.BillService;
@@ -35,10 +36,12 @@ public class BillController {
         return ResponseEntity.ok(billService.saveBill(bill));
     }
 
-    @GetMapping("/bill")
-    public ResponseEntity<List<Bill>> getAllBills() {
-        return ResponseEntity.ok(billService.getAllBills());
+    @GetMapping("/bills")
+    public ResponseEntity<List<BillDTO>> getAllBills() {
+        List<BillDTO> billDTOs = billService.getAllBills();
+        return ResponseEntity.ok(billDTOs);
     }
+
 
     // Endpoint para obtener información del propietario por ID
     @GetMapping("/owner/{id}")

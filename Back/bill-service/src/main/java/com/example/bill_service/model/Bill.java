@@ -1,5 +1,7 @@
 package com.example.bill_service.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -30,7 +32,7 @@ public class Bill {
     private LocalDate secondExpirationDate;
     private Double secondExpirationAmount;
 
-    @OneToOne
+    @ManyToOne
     @JoinColumn(name = "payment_method_id", referencedColumnName = "id")
     private PaymentMethod paymentMethod;
 

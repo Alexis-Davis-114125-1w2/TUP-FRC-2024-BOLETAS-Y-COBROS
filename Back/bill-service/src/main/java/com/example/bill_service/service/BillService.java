@@ -1,7 +1,9 @@
 package com.example.bill_service.service;
 
+import com.example.bill_service.dto.BillDTO;
 import com.example.bill_service.model.Bill;
 import com.example.bill_service.repository.BillRepository;
+
 import com.itextpdf.html2pdf.HtmlConverter;
 import com.itextpdf.kernel.geom.PageSize;
 import com.itextpdf.kernel.pdf.PdfDocument;
@@ -9,12 +11,16 @@ import com.itextpdf.kernel.pdf.PdfWriter;
 import com.itextpdf.layout.Document;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import org.modelmapper.ModelMapper;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class BillService {
@@ -22,10 +28,15 @@ public class BillService {
     @Autowired
     private BillRepository billRepository;
 
-    public List<Bill> getAllBills() {
-        return billRepository.findAll();
-    }
+    @Autowired
+    private ModelMapper modelMapper;
 
+    public List<BillDTO> getAllBills() {
+        List<Bill> bills = billRepository.findAll();
+        List<BillDTO> billsdto = new ArrayList<>();
+        bills.forEach(bill -> billsdto.add(modelMapper.map(bill, BillDTO.class)));
+        return billsdto;
+    }
     public Bill getBillById(Long id) {
         return billRepository.findById(id).orElse(null);
     }
