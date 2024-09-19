@@ -33,7 +33,7 @@
                 <td>$ {{ facturaActual.monto | number:'1.2-2' }}</td>
                 <td>{{ facturaActual.lista }}</td>
                 <td>{{ facturaActual.estado }}</td>
-                <td><a [href]="facturaActual.urlBoleta" target="_blank" class="btn btn-primary btn-sm">Ver Boleta</a></td>
+                <td><a (click)="descargarPdf()" target="_blank" class="btn btn-primary btn-sm">Ver Boleta</a></td>
                 <td><button (click)="pagar(facturaActual.urlPago)" class="btn btn-success btn-sm">Pagar</button></td>
               </tr>
             } @else {

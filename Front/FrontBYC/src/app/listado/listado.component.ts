@@ -105,4 +105,25 @@ export class ListadoComponent implements OnInit {
   pagar(urlPago: string) {
     window.open(urlPago, '_blank');
   }
+
+
+  async descargarPdf() {
+    try {
+      const response = await fetch(`http://localhost:8080/api/`);
+      if (!response.ok) {
+        throw new Error('No se pudo descargar el pdf');
+      }
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'bill.pdf';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      window.URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error('Hubo un error al descargar el pdf:', error);
+    }
+  }
 }
