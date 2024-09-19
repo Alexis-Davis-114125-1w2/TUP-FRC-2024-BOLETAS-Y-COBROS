@@ -1,0 +1,35 @@
+services:
+  mysql:
+    image: mysql:latest
+    container_name: bill-service_db
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: bill_db
+      MYSQL_USER: user
+      MYSQL_PASSWORD: password
+    ports:
+      - "3306:3306"
+    volumes:
+      - bills_data:/var/lib/mysql
+      - ./mysql-init:/docker-entrypoint-initdb.d
+
+  bill-service:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: bill-service
+    ports:
+      - "8080:8080"
+    depends_on:
+      - mysql
+    environment:
+      MYSQL_HOST: mysql
+      MYSQL_PORT: 3306
+      MYSQL_DATABASE: bill_db
+      MYSQL_USER: user
+      MYSQL_PASSWORD: password
+    command: --lower_case_table_names=0
+    restart: on-failure
+
+volumes:
+  bills_data:
