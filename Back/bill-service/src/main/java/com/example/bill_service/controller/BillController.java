@@ -6,6 +6,8 @@ import com.example.bill_service.service.BillService;
 import com.example.bill_service.service.OwnerService;
 import com.example.bill_service.service.PaymentService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -71,6 +73,24 @@ public class BillController {
     public ResponseEntity<PaymentResponse> processPayment(@RequestBody PaymentRequest paymentRequest) {
         PaymentResponse response = paymentService.processPayment(paymentRequest);
         return ResponseEntity.ok(response);
+    }
+
+
+    // Endpoint para descargar la boleta en formato pdf
+    @CrossOrigin(origins = "http://localhost:4200")
+    @GetMapping("/bill/pdf")
+    public ResponseEntity<byte[]> generateBillPdf(){
+
+        byte[] pdfBytes = billService.generateBillPdf();
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_PDF);
+        headers.setContentDispositionFormData("attachment", "Bill.pdf");
+
+        return ResponseEntity.ok()
+                .headers(headers)
+                .body(pdfBytes);
+
     }
 
 
