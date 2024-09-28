@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Formulario de Pago</title>
+    <script src="https://js.stripe.com/v3/"></script>
+</head>
+<body>
+<h1>Pagar</h1>
+
+<!-- Input para el monto a pagar -->
+<div id="amount-input">
+    <label for="amount">Monto:</label>
+    <input type="number" id="amount" step="0.01" required />
+    <button id="proceed-to-payment">Proceder al pago</button>
+</div>
+
+<!-- Formulario de pago que se mostrará tras la creación del PaymentIntent -->
+<div id="payment-form" style="display: none;">
+    <form id="payment-element-form">
+        <div id="payment-element"></div>
+        <button id="submit" type="submit">Pagar</button>
+    </form>
+</div>
+
+<!-- Loader -->
+<div id="loading" style="display: none;">Cargando...</div>
+
+<!-- Mensajes de error o éxito -->
+<div id="messages"></div>
+
+<script>
+    const stripe = Stripe('pk_test_51Q3iwwRwJDdlWggbw9AqW6ETZEuj0aRgDME6NdDAbamdDihYRdK4k0G1dbR3IPNYqm3k2vt1tCpIJKrQ85IR8rNE00mGz2BoE9'); // Reemplaza con tu clave pública de Stripe
+    let elements;
+
+    // Función para mostrar mensajes en pantalla
+    function showMessage(messageText) {
+        const messageContainer = document.querySelector('#messages');
+        messageContainer.textContent = messageText;
+    }
+
+    // Manejador de envío del formulario
+    async function handleSubmit(e) {
+        e.preventDefault();
+        const amountInput = document.querySelector("#amount");
+        const amount = Math.round(parseFloat(amountInput.value) * 100); // Convierte a centavos
+
+        if (isNaN(amount) || amount <= 0) {
+            alert("Por favor, ingrese un monto válido.");
+            return;
+        }
+
+        document.querySelector("#loading").style.display = "block";
+
+        try {
+            const response = await fetch("/create-payment-intent", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ amount })
+            });
+
+            if (!response.ok) {
+                throw new Error('La respuesta del servidor no fue exitosa');
+            }
+
+            const { clientSecret } = await response.json();
+
+            // Crear un objeto `elements` con el `clientSecret`
+            elements = stripe.elements({ clientSecret });
+
+            // Crear un PaymentElement
+            const paymentElement = elements.create("payment");
+
+            // Manejador del evento 'loaderror'
+            paymentElement.on('loaderror', function(event) {
+                console.error('Payment Element load error:', event.error);
+                showMessage('Error al cargar el formulario de pago. Por favor, intente más tarde.');
+            });
+
+            // Montar el PaymentElement en el DOM
+            await paymentElement.mount("#payment-element");
+
+            // Mostrar el formulario de pago y ocultar el input de monto
+            document.querySelector("#amount-input").style.display = "none";
+            document.querySelector("#payment-form").style.display = "block";
+        } catch (error) {
+            console.error('Error al cargar el formulario de pago:', error);
+            showMessage("Hubo un error al iniciar el pago. Por favor, intente de nuevo.");
+        } finally {
+            document.querySelector("#loading").style.display = "none";
+        }
+    }
+
+    // Agregar evento al botón de proceder al pago
+    document.querySelector("#proceed-to-payment").addEventListener("click", handleSubmit);
+
+    // Manejador para el formulario de pago una vez que esté montado
+    document.querySelector("#payment-element-form").addEventListener("submit", async (e) => {
+        e.preventDefault();
+
+        document.querySelector("#loading").style.display = "block";
+
+        const { error } = await stripe.confirmPayment({
+            elements,
+            confirmParams: {
+                return_url: window.location.origin + '/return.html', // Ajusta la URL de retorno si es necesario
+            },
+        });
+
+        if (error) {
+            showMessage(error.message);
+            document.querySelector("#loading").style.display = "none";
+        }
+    });
+</script>
+</body>
+</html>

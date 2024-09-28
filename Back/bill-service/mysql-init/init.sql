@@ -14,7 +14,7 @@ CREATE TABLE IF NOT EXISTS statuses (
 INSERT INTO statuses (description) VALUES
 ('Pago'),
 ('Pendiente'),
-('Atrasado');
+('Exceptuado');
 
 -- Crear tabla PaymentMethod
 CREATE TABLE IF NOT EXISTS payment_methods (
@@ -25,8 +25,8 @@ CREATE TABLE IF NOT EXISTS payment_methods (
 -- Insertar datos en PaymentMethod
 INSERT INTO payment_methods (description) VALUES
 ('Tarjeta de crédito'),
-('Transferencia bancaria'),
-('Efectivo');
+('Tarjeta de debito'),
+('Efectivo (RapiPago o PagoFacil)');
 
 -- Crear tabla ExpenseType
 CREATE TABLE IF NOT EXISTS expense_types (
@@ -44,7 +44,6 @@ INSERT INTO expense_types (description) VALUES
 CREATE TABLE IF NOT EXISTS bills (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     owner_id BIGINT,
-    bill_amount DOUBLE,
     first_expiration_date DATE,
     first_expiration_amount DOUBLE,
     second_expiration_date DATE,
@@ -60,10 +59,10 @@ CREATE TABLE IF NOT EXISTS bills (
 );
 
 -- Insertar datos en Bill
-INSERT INTO bills (owner_id, bill_amount, first_expiration_date, first_expiration_amount, second_expiration_date, second_expiration_amount, payment_method_id, status_id, created_date, created_user, last_updated_date, last_updated_user) VALUES
-(1, 1000.00, '2024-10-01', 950.00, '2024-10-15', 1000.00, 1, 2, NOW(), 'admin', NOW(), 'admin'),
-(2, 750.50, '2024-10-05', 700.00, '2024-10-20', 750.50, 2, 1, NOW(), 'admin', NOW(), 'admin'),
-(3, 1250.75, '2024-10-10', 1200.00, '2024-10-25', 1250.75, 3, 3, NOW(), 'admin', NOW(), 'admin');
+INSERT INTO bills (owner_id, first_expiration_date, first_expiration_amount, second_expiration_date, second_expiration_amount, payment_method_id, status_id, created_date, created_user, last_updated_date, last_updated_user) VALUES
+(1, '2024-10-01', 950.00, '2024-10-15', 1000.00, 1, 2, NOW(), 'admin', NOW(), 'admin'),
+(2, '2024-10-05', 700.00, '2024-10-20', 750.50, null, 1, NOW(), 'admin', NOW(), 'admin'),
+(3, '2024-10-10', 1200.00, '2024-10-25', 1250.75, null, 3, NOW(), 'admin', NOW(), 'admin');
 
 -- Crear tabla BillDetail
 CREATE TABLE IF NOT EXISTS bill_details (

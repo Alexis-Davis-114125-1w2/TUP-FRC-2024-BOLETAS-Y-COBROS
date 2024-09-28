@@ -13,7 +13,6 @@ import java.time.LocalDate;
 public class BillDTO {
     private Long id;
     private Long ownerId;
-    private Double billAmount;
     private LocalDate firstExpirationDate;
     private Double firstExpirationAmount;
     private LocalDate secondExpirationDate;

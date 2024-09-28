@@ -1,85 +1,74 @@
 <div class="container mt-4">
   <div class="row justify-content-center">
-    @if (facturaActual) {
-      <div class="col-md-6 text-center mb-4">
-        <div class="card">
-          <div class="card-body">
-            <h4 class="card-title" style="color: #007bff;">Total a pagar: $ {{ facturaActual.monto | number:'1.2-2' }}</h4>
-          </div>
-        </div>
-      </div>
-    }
-
     <div class="col-md-12">
-      <h5 class="mb-3">Factura actual</h5>
+      <h5 class="mb-3">Facturas pendientes de pago</h5>
       <div class="table-responsive">
         <table class="table table-bordered table-hover">
           <thead class="table-light">
-            <tr>
-              <th>Fecha de Emisión</th>
-              <th>Periodo</th>
-              <th>Monto</th>
-              <th>Lista</th>
-              <th>Estado</th>
-              <th>Ver Boleta</th>
-              <th>Pagar</th>
-            </tr>
+          <tr>
+            <th>Seleccionar</th>
+            <th>Fecha de Emisión</th>
+            <th>Primer Vencimiento</th>
+            <th>Monto</th>
+            <th>Estado</th>
+          </tr>
           </thead>
           <tbody>
-            @if (facturaActual) {
-              <tr>
-                <td>{{ facturaActual.fechaEmision | date:'dd/MM/yyyy' }}</td>
-                <td>{{ facturaActual.periodo }}</td>
-                <td>$ {{ facturaActual.monto | number:'1.2-2' }}</td>
-                <td>{{ facturaActual.lista }}</td>
-                <td>{{ facturaActual.estado }}</td>
-                <td><a (click)="descargarPdf()" target="_blank" class="btn btn-primary btn-sm">Ver Boleta</a></td>
-                <td><button (click)="pagar(facturaActual.urlPago)" class="btn btn-success btn-sm">Pagar</button></td>
-              </tr>
-            } @else {
-              <tr>
-                <td colspan="7" class="text-center">No hay facturas pendientes.</td>
-              </tr>
-            }
+          <tr *ngFor="let boleta of boletasNoPagadas; trackBy: trackById">
+            <td><input type="checkbox" [ngModel]="boleta.selected" (ngModelChange)="toggleSeleccion(boleta)"></td>
+            <td>{{ boleta.firstExpirationDate | date:'dd/MM/yyyy' }}</td>
+            <td>{{ boleta.firstExpirationDate }}</td>
+            <td>$ {{ boleta.firstExpirationAmount | number:'1.2-2' }}</td>
+            <td>{{ boleta.status }}</td>
+          </tr>
+          <tr *ngIf="boletasNoPagadas.length === 0">
+            <td colspan="5" class="text-center">No hay facturas pendientes.</td>
+          </tr>
           </tbody>
         </table>
       </div>
 
-      <h5 class="mt-4 mb-3">Historial de facturas pagadas</h5>
+      <div class="text-end mt-3 mb-4">
+        <h5>Total seleccionado: $ {{ totalSeleccionado | number:'1.2-2' }}</h5>
+        <button (click)="pagar()" class="btn btn-success" [disabled]="totalSeleccionado === 0">Pagar seleccionadas</button>
+      </div>
+
+      <h5 class="mt-4 mb-3">Historial de facturas pagadas y exceptuadas</h5>
       <div class="table-responsive">
         <table class="table table-bordered table-hover">
           <thead class="table-light">
-            <tr>
-              <th>Fecha de Emisión</th>
-              <th>Periodo</th>
-              <th>Monto</th>
-              <th>Lista</th>
-              <th>Estado</th>
-              <th>Ver Boleta</th>
-            </tr>
+          <tr>
+            <th>Fecha de Emisión</th>
+            <th>Primer Vencimiento</th>
+            <th>Monto</th>
+            <th>Estado</th>
+          </tr>
           </thead>
           <tbody>
-            
-            @for (boleta of boletas; track boleta.fechaEmision) {
-              <tr>
-                <td>{{ boleta.fechaEmision | date:'dd/MM/yyyy' }}</td>
-                <td>{{ boleta.periodo }}</td>
-                <td>$ {{ boleta.monto | number:'1.2-2' }}</td>
-                <td>{{ boleta.lista }}</td>
-                <td>{{ boleta.estado }}</td>
-                <td><a [href]="boleta.urlBoleta" target="_blank" class="btn btn-primary btn-sm">Ver Boleta</a></td>
-              </tr>
-            } @empty {
-              <tr>
-                <td colspan="6" class="text-center">No hay facturas pagadas.</td>
-              </tr>
-            }
+          <tr *ngFor="let boleta of boletasPagadas; trackBy: trackById">
+            <td>{{ boleta.firstExpirationDate | date:'dd/MM/yyyy' }}</td>
+            <td>{{ boleta.firstExpirationDate }}</td>
+            <td>$ {{ boleta.firstExpirationAmount | number:'1.2-2' }}</td>
+            <td>{{ boleta.status }}</td>
+          </tr>
+          <tr *ngIf="boletasPagadas.length === 0">
+            <td colspan="4" class="text-center">No hay facturas pagadas o exceptuadas.</td>
+          </tr>
           </tbody>
         </table>
       </div>
-      <div class="text-end mt-3">
-        <h5>Total pagado: $ {{ totalPagado | number:'1.2-2' }}</h5>
-      </div>
+    </div>
+  </div>
+
+  <!-- Modal para Stripe -->
+  <div class="modal" [style.display]="showStripeModal ? 'block' : 'none'">
+    <div class="modal-content">
+      <span class="close" (click)="cerrarModal()">&times;</span>
+      <app-stripe-payment
+        [amount]="totalSeleccionado"
+        [billInfo]="boletasSeleccionadas"
+        (paymentComplete)="onPaymentComplete($event)">
+      </app-stripe-payment>
     </div>
   </div>
 </div>
