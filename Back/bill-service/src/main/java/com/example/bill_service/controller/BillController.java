@@ -79,16 +79,15 @@ public class BillController {
     }
 
 
-    // Endpoint para descargar la boleta en formato pdf
+    // Endpoint para ver la boleta en formato pdf
     @CrossOrigin(origins = "http://localhost:4200")
-    @GetMapping("/bill/pdf")
-    public ResponseEntity<byte[]> generateBillPdf(){
+    @GetMapping("/bill/pdf/{id}")
+    public ResponseEntity<byte[]> generateBillPdf(@PathVariable Long id){
 
-        byte[] pdfBytes = billService.generateBillPdf();
+        byte[] pdfBytes = billService.generateBillPdf(id);
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_PDF);
-        headers.setContentDispositionFormData("attachment", "Bill.pdf");
 
         return ResponseEntity.ok()
                 .headers(headers)

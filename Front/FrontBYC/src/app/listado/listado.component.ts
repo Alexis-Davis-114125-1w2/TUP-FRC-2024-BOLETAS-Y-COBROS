@@ -107,23 +107,19 @@ export class ListadoComponent implements OnInit {
   }
 
 
-  async descargarPdf() {
+  async openPdf(id: number) {
     try {
-      const response = await fetch(`http://localhost:8080/api/`);
+      const response = await fetch(`http://localhost:8080/api/bill/pdf/${id}`);
       if (!response.ok) {
-        throw new Error('No se pudo descargar el pdf');
+        alert("No se pudo cargar el pdf")
       }
       const blob = await response.blob();
       const url = window.URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = 'bill.pdf';
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      window.URL.revokeObjectURL(url);
+      window.open(url);
     } catch (error) {
-      console.error('Hubo un error al descargar el pdf:', error);
+      console.error('There was an error opening the PDF:', error);
     }
   }
+
+
 }

@@ -8,8 +8,8 @@ public class Owner {
     private String name;
     private String home ;
     private String email;
-    private Integer cuit;
-    private Integer phone;
+    private Long cuit;
+    private Long phone;
     private String tax_situation;
     // Otros campos según la respuesta de la API
 }
