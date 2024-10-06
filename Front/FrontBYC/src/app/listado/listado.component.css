@@ -1,0 +1,79 @@
+.sidebar {
+    width: 60px;
+    position: fixed;
+    height: 100%;
+    background-color: #28a745;
+    transition: all 0.3s;
+}
+  
+.sidebar .nav-link {
+    text-align: center;
+    padding: 15px 0;
+    color: white;
+}
+  
+.sidebar .nav-link:hover {
+    background-color: #1e7e34;
+}
+  
+.sidebar i {
+    font-size: 1.5rem;
+}
+  
+.main-content {
+    margin-left: 60px;
+    padding: 20px;
+}
+  
+.card {
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    margin-bottom: 20px;
+}
+  
+.card-body {
+    padding: 15px;
+}
+  
+.checkbox-container {
+    position: absolute;
+    top: 5px;
+    right: 10px;
+}
+  
+.btn-pagar {
+    background-color: #28a745;
+    color: white;
+}
+  
+.btn-pagar:hover {
+    background-color: #218838;
+}
+  
+.filter-container {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+  
+.filter-item {
+    flex: 1;
+}
+  
+.table th {
+    background-color: #28a745;
+    color: white;
+}
+  
+.table td {
+    vertical-align: middle;
+}
+  
+.download-icon {
+    font-size: 1.5rem;
+    color: #007bff;
+}
+  
+.download-icon:hover {
+    color: #0056b3;
+}

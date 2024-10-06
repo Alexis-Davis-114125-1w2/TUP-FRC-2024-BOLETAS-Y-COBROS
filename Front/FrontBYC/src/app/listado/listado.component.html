@@ -1,4 +1,4 @@
-<div class="container mt-4">
+<!--<div class="container mt-4">
   <div class="row justify-content-center">
     @if (facturaActual) {
       <div class="col-md-6 text-center mb-4">
@@ -82,4 +82,100 @@
       </div>
     </div>
   </div>
+</div>
+-->
+<div class="sidebar">
+  <ul class="nav flex-column">
+    <li class="nav-item">
+      <a class="nav-link active" href="#" title="Inicio">
+        <i class="fas fa-home"></i>
+      </a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" href="#" title="Mis Boletas">
+        <i class="fas fa-file-invoice"></i>
+      </a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" href="#" title="Reportes">
+        <i class="fas fa-chart-pie"></i>
+      </a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" href="#" title="Configuración">
+        <i class="fas fa-cog"></i>
+      </a>
+    </li>
+  </ul>
+</div>
+
+<div class="main-content">
+  <h2>MIS BOLETAS</h2>
+  <div class="row">
+    <div class="col-3" *ngFor="let boleta of documentosAPagar">
+      <div class="card h-100">
+        <div class="card-body">
+          <h5 class="card-title">Periodo: {{ boleta.periodo }}</h5>
+          <p class="card-text text-danger">Vencimiento: {{ boleta.fechaEmision }}</p>
+          <p class="card-text">${{ boleta.monto }}</p>
+          <button class="btn btn-primary" (click)="descargarPdf(boleta.urlBoleta)">
+            <i class="fas fa-print"></i>
+          </button>
+          <div class="checkbox-container">
+            <input type="checkbox" [(ngModel)]="boleta.selected" (change)="updateTotalAPagar()" />
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="d-flex justify-content-between align-items-center my-4">
+    <h4>Total a Pagar: {{ totalAPagar | currency: 'USD' }}</h4>
+    <button class="btn btn-pagar" (click)="pagar()" [disabled]="totalAPagar === 0">Pagar</button>
+  </div>
+
+  <h2>DOCUMENTOS PAGADOS</h2>
+  <div class="filter-container">
+    <div class="filter-item">
+      <label for="filtroDesde">Desde:</label>
+      <input id="filtroDesde" type="date" [(ngModel)]="filtroDesde" class="form-control" />
+    </div>
+    <div class="filter-item">
+      <label for="filtroHasta">Hasta:</label>
+      <input id="filtroHasta" type="date" [(ngModel)]="filtroHasta" class="form-control" />
+    </div>
+    <div class="filter-item">
+      <label for="filtroEstado">Estado:</label>
+      <select id="filtroEstado" [(ngModel)]="filtroEstado" class="form-control">
+        <option value="">Todos</option>
+        <option value="Pagado">Pagado</option>
+        <option value="Pendiente">Pendiente</option>
+      </select>
+    </div>
+    <div class="filter-item">
+      <label>&nbsp;</label>
+      <button class="btn btn-success form-control" (click)="buscar()">Buscar</button>
+    </div>
+  </div>
+
+  <table class="table table-striped">
+    <thead>
+      <tr>
+        <th>Fecha de pago</th>
+        <th>Periodo</th>
+        <th>Importe</th>
+        <th>Estado</th>
+        <th>Descargar</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let boleta of boletasPagadasFiltradas">
+        <td>{{ boleta.fechaEmision }}</td>
+        <td>{{ boleta.periodo }}</td>
+        <td>${{ boleta.monto }}</td>
+        <td>{{ boleta.estado }}</td>
+        <td><a href="#" (click)="descargarPdf(boleta.urlBoleta)"><i class="fas fa-download download-icon"></i></a></td>
+      </tr>
+    </tbody>
+  </table>
 </div>
