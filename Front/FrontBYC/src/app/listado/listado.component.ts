@@ -1,109 +1,75 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 
 interface Boleta {
+  id: number;
   fechaEmision: string;
   periodo: string;
   monto: number;
-  lista: string;
   estado: string;
   urlBoleta: string;
-  urlPago: string;
+  selected?: boolean;
 }
 
 @Component({
   selector: 'app-listado',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, FormsModule],
   templateUrl: './listado.component.html',
-  styleUrls: ['./listado.component.css']
+  styleUrls: ['./listado.component.css'],
 })
 export class ListadoComponent implements OnInit {
-  boletas: Boleta[] = [];
-  facturaActual: Boleta | null = null;
-  totalPagado: number = 0;
+  documentosAPagar: Boleta[] = [];
+  boletasPagadas: Boleta[] = [];
+  boletasPagadasFiltradas: Boleta[] = [];
+  totalAPagar: number = 0;
+  filtroDesde: string = '';
+  filtroHasta: string = '';
+  filtroEstado: string = '';
 
   ngOnInit() {
     this.cargarBoletasEjemplo();
+    this.aplicarFiltros();
   }
 
   cargarBoletasEjemplo() {
-    const boletasNoPagadas: Boleta[] = [
-      {
-        fechaEmision: '2024-09-01',
-        periodo: 'Septiembre 2024',
-        monto: 5000,
-        lista: 'Expensas',
-        estado: 'No Pagado',
-        urlBoleta: 'https://ejemplo.com/boleta1',
-        urlPago: 'https://www.mercadopago.com.ar'
-      },
-      {
-        fechaEmision: '2024-08-01',
-        periodo: 'Agosto 2024',
-        monto: 4800,
-        lista: 'Expensas',
-        estado: 'No Pagado',
-        urlBoleta: 'https://ejemplo.com/boleta2',
-        urlPago: 'https://www.mercadopago.com.ar'
-      },
-      {
-        fechaEmision: '2024-07-01',
-        periodo: 'Julio 2024',
-        monto: 4600,
-        lista: 'Expensas',
-        estado: 'No Pagado',
-        urlBoleta: 'https://ejemplo.com/boleta3',
-        urlPago: 'https://www.mercadopago.com.ar'
-      }
+    this.documentosAPagar = [
+      { id: 1, fechaEmision: '2024-09-02', periodo: '08/2024', monto: 10000, estado: 'Pendiente', urlBoleta: 'https://ejemplo.com/boleta1', selected: false },
+      { id: 2, fechaEmision: '2024-10-02', periodo: '09/2024', monto: 10000, estado: 'Pendiente', urlBoleta: 'https://ejemplo.com/boleta2', selected: false },
+      { id: 3, fechaEmision: '2024-11-02', periodo: '10/2024', monto: 10000, estado: 'Pendiente', urlBoleta: 'https://ejemplo.com/boleta3', selected: false },
+      { id: 4, fechaEmision: '2024-12-02', periodo: '11/2024', monto: 10000, estado: 'Pendiente', urlBoleta: 'https://ejemplo.com/boleta4', selected: false },
     ];
 
-    this.boletas = [
-      {
-        fechaEmision: '2024-06-01',
-        periodo: 'Junio 2024',
-        monto: 4400,
-        lista: 'Expensas',
-        estado: 'Pagado',
-        urlBoleta: 'https://ejemplo.com/boleta4',
-        urlPago: 'https://www.mercadopago.com.ar'
-      },
-      {
-        fechaEmision: '2024-05-01',
-        periodo: 'Mayo 2024',
-        monto: 4200,
-        lista: 'Expensas',
-        estado: 'Pagado',
-        urlBoleta: 'https://ejemplo.com/boleta5',
-        urlPago: 'https://www.mercadopago.com.ar'
-      }
+    this.boletasPagadas = [
+      { id: 5, fechaEmision: '2024-08-04', periodo: '07/2024', monto: 12500, estado: 'Pagado', urlBoleta: 'https://ejemplo.com/boleta5' },
     ];
-
-    this.calcularFacturaActual(boletasNoPagadas);
-    this.calcularTotalPagado();
   }
 
-  calcularFacturaActual(boletasNoPagadas: Boleta[]) {
-    const totalNoPagado = boletasNoPagadas.reduce((sum, boleta) => sum + boleta.monto, 0);
-    const recargo = totalNoPagado * 0.05 * boletasNoPagadas.length;
-    const montoTotal = totalNoPagado + recargo;
-    this.facturaActual = {
-      fechaEmision: new Date().toISOString().split('T')[0],
-      periodo: 'Facturas pendientes',
-      monto: montoTotal,
-      lista: 'Expensas acumuladas',
-      estado: 'No Pagado',
-      urlBoleta: 'https://ejemplo.com/factura-actual',
-      urlPago: 'https://www.mercadopago.com.ar'
-    };
+  updateTotalAPagar() {
+    this.totalAPagar = this.documentosAPagar
+      .filter(doc => doc.selected)
+      .reduce((sum, doc) => sum + doc.monto, 0);
   }
 
-  calcularTotalPagado() {
-    this.totalPagado = this.boletas.reduce((sum, boleta) => sum + boleta.monto, 0);
+  pagar() {
+    const documentosSeleccionados = this.documentosAPagar.filter(doc => doc.selected);
+    documentosSeleccionados.forEach(doc => {
+      doc.estado = 'Pagado';
+      this.boletasPagadas.push({ ...doc, selected: false });
+    });
+
+    this.documentosAPagar = this.documentosAPagar.filter(doc => !doc.selected);
+    this.updateTotalAPagar();
+    this.aplicarFiltros();
   }
 
-  pagar(urlPago: string) {
-    window.open(urlPago, '_blank');
+  descargarPdf(url: string) {
+    window.open(url, '_blank');
+  }
+
+  buscar() {
+    this.aplicarFiltros();
   }
 
 
@@ -119,6 +85,16 @@ export class ListadoComponent implements OnInit {
     } catch (error) {
       console.error('There was an error opening the PDF:', error);
     }
+
+  aplicarFiltros() {
+    this.boletasPagadasFiltradas = this.boletasPagadas.filter(doc => {
+      const fechaDoc = new Date(doc.fechaEmision);
+      const cumpleFechaDesde = !this.filtroDesde || fechaDoc >= new Date(this.filtroDesde);
+      const cumpleFechaHasta = !this.filtroHasta || fechaDoc <= new Date(this.filtroHasta);
+      const cumpleEstado = !this.filtroEstado || doc.estado === this.filtroEstado;
+      return cumpleFechaDesde && cumpleFechaHasta && cumpleEstado;
+    });
+
   }
 
 
