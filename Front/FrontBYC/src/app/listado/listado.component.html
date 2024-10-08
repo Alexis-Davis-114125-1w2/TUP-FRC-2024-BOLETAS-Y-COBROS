@@ -84,6 +84,8 @@
   </div>
 </div>
 -->
+
+<!-- Sidevar del menu-->
 <div class="sidebar">
   <ul class="nav flex-column">
     <li class="nav-item">
@@ -112,7 +114,7 @@
 <div class="main-content">
   <h2>MIS BOLETAS</h2>
   <div class="row">
-    <div class="col-3" *ngFor="let boleta of documentosAPagar">
+    <div class="col-lg-3 col-md-4 col-sm-6 col-12 mb-3" *ngFor="let boleta of documentosAPagar">
       <div class="card h-100">
         <div class="card-body">
           <h5 class="card-title">Periodo: {{ boleta.periodo }}</h5>
@@ -135,8 +137,8 @@
   </div>
 
   <h2>DOCUMENTOS PAGADOS</h2>
-  <div class="filter-container">
-    <div class="filter-item">
+  <div class="filter-container row">
+    <div class="filter-item col-lg-3 col-md-4 col-sm-6 col-12 mb-3">
       <label for="filtroDesde">Desde:</label>
       <input id="filtroDesde" type="date" [(ngModel)]="filtroDesde" class="form-control" />
     </div>
