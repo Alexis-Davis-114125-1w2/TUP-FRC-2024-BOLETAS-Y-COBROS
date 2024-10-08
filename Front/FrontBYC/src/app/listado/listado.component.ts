@@ -72,6 +72,20 @@ export class ListadoComponent implements OnInit {
     this.aplicarFiltros();
   }
 
+
+  async openPdf(id: number) {
+    try {
+      const response = await fetch(`http://localhost:8080/api/bill/pdf/${id}`);
+      if (!response.ok) {
+        alert("No se pudo cargar el pdf")
+      }
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      window.open(url);
+    } catch (error) {
+      console.error('There was an error opening the PDF:', error);
+    }
+
   aplicarFiltros() {
     this.boletasPagadasFiltradas = this.boletasPagadas.filter(doc => {
       const fechaDoc = new Date(doc.fechaEmision);
@@ -80,5 +94,8 @@ export class ListadoComponent implements OnInit {
       const cumpleEstado = !this.filtroEstado || doc.estado === this.filtroEstado;
       return cumpleFechaDesde && cumpleFechaHasta && cumpleEstado;
     });
+
   }
+
+
 }

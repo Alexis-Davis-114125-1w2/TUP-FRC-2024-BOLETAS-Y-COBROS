@@ -8,12 +8,12 @@ import org.springframework.web.client.RestTemplate;
 @Service
 public class OwnerService {
 
-    private static final String OWNER_API_URL = "https://raw.githubusercontent.com/405313-Almeida/Fake_Api_Users/main/db.json";
+    private static final String OWNER_API_URL = "https://apimocha.com/eugefifa/owner";
 
     @Autowired
     private RestTemplate restTemplate;
 
     public Owner getOwnerById(Long id) {
-        return restTemplate.getForObject(OWNER_API_URL + id, Owner.class);
+        return restTemplate.getForObject(OWNER_API_URL, Owner.class);
     }
 }
