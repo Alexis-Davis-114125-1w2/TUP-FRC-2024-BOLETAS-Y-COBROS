@@ -1,9 +1,9 @@
 package com.example.bill_service.service;
 
+import com.example.bill_service.client.Owner;
 import com.example.bill_service.dto.BillDTO;
 import com.example.bill_service.model.Bill;
 import com.example.bill_service.model.BillDetail;
-import com.example.bill_service.model.Owner;
 import com.example.bill_service.repository.BillRepository;
 
 import com.google.zxing.BarcodeFormat;
@@ -124,9 +124,9 @@ public class BillService {
             infoTable.addCell(new Cell().setBorder(Border.NO_BORDER).add(new Paragraph("Nombre: Curso-2w1-2024")));
             infoTable.addCell(new Cell().setBorder(Border.NO_BORDER).add(new Paragraph("Nombre: "+owner.getName())));
             infoTable.addCell(new Cell().setBorder(Border.NO_BORDER).add(new Paragraph("Domicilio: Cordoba-Argentina")));
-            infoTable.addCell(new Cell().setBorder(Border.NO_BORDER).add(new Paragraph("CUIT: " +owner.getCuit().toString())));
-            infoTable.addCell(new Cell().setBorder(Border.NO_BORDER).add(new Paragraph("Mail: info@gmail.com")));
-            infoTable.addCell(new Cell().setBorder(Border.NO_BORDER).add(new Paragraph("Domicilio: "+ owner.getHome())));
+            infoTable.addCell(new Cell().setBorder(Border.NO_BORDER).add(new Paragraph("DNI: " +owner.getDni())));
+            infoTable.addCell(new Cell().setBorder(Border.NO_BORDER).add(new Paragraph("Email: info@gmail.com")));
+            infoTable.addCell(new Cell().setBorder(Border.NO_BORDER).add(new Paragraph("Email: "+ owner.getEmail())));
             infoTable.addCell(new Cell().setBorder(Border.NO_BORDER).add(new Paragraph("CUIT: 20-12345678-4")));
 
             // Añadir la tabla de información dentro del cuadro

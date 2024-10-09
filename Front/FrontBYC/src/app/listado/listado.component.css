@@ -1,39 +1,77 @@
+
+/* ------------- Estilos de la barra lateral ---------------- */
+
 .sidebar {
     width: 60px;
     position: fixed;
+    top: 0;
+    left: 0;
     height: 100%;
-    background-color: #28a745;
+    background-color: #41916C;
     transition: all 0.3s;
-}
+    z-index: 99999;
+  }
   
-.sidebar .nav-link {
+  .sidebar .nav-link {
     text-align: center;
     padding: 15px 0;
     color: white;
-}
+  }
   
-.sidebar .nav-link:hover {
-    background-color: #1e7e34;
-}
+  .sidebar .nav-link:hover {
+    background-color: #6cee8b49;
+  }
   
-.sidebar i {
+  .sidebar i {
     font-size: 1.5rem;
-}
+  }
   
+  .container-fluid .row {
+    margin: 0;
+  }
+  
+  .container-fluid .row .col-12 {
+    padding: 0;
+  }
+
+  .my-btn{
+    background-color: #aec2b0;
+    border-radius: 20px;
+  }
+  .my-btn:hover{
+    background-color: #78c4a0;
+  }
+  
+  body {
+    padding-left: 60px; 
+  }
+  
+  @media (max-width: 991.98px) {
+    body {
+      padding-left: 0;
+    }
+  
+    .offcanvas-start {
+      background-color: #41916C;
+    }
+  
+    .offcanvas-start .nav-link {
+      color: white;
+    }
+  
+    .offcanvas-start .nav-link:hover {
+      background-color: #6cee8b49;
+    }
+  }
+
+  /* ---------------------------------------------------- */
+
 .main-content {
     margin-left: 60px;
     padding: 20px;
 }
   
-.card {
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    border-radius: 8px;
-    margin-bottom: 20px;
-}
-  
-.card-body {
-    padding: 15px;
-}
+
   
 .checkbox-container {
     position: absolute;
@@ -42,12 +80,12 @@
 }
   
 .btn-pagar {
-    background-color: #28a745;
+    background-color: #41916C;
     color: white;
 }
   
 .btn-pagar:hover {
-    background-color: #218838;
+    background-color: #41916C;
 }
   
 .filter-container {
@@ -69,11 +107,11 @@
     vertical-align: middle;
 }
   
-.download-icon {
-    font-size: 1.5rem;
-    color: #007bff;
-}
-  
-.download-icon:hover {
-    color: #0056b3;
-}
+
+
+
+hr.dark-line {
+    border: 1px solid #6e6e6e;
+    margin-top: 10px;
+    margin-bottom: 20px;
+  }

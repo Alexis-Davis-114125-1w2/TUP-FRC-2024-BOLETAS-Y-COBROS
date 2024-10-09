@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { ExpenseCardComponent } from "../expense-card/expense-card.component";
 
 interface Boleta {
   id: number;
@@ -15,7 +16,7 @@ interface Boleta {
 @Component({
   selector: 'app-listado',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, ExpenseCardComponent],
   templateUrl: './listado.component.html',
   styleUrls: ['./listado.component.css'],
 })
@@ -23,14 +24,19 @@ export class ListadoComponent implements OnInit {
   documentosAPagar: Boleta[] = [];
   boletasPagadas: Boleta[] = [];
   boletasPagadasFiltradas: Boleta[] = [];
-  totalAPagar: number = 0;
   filtroDesde: string = '';
   filtroHasta: string = '';
   filtroEstado: string = '';
+  total: number = 0;
+
 
   ngOnInit() {
     this.cargarBoletasEjemplo();
-    this.aplicarFiltros();
+  }
+
+
+  recieveAmount(amount: number) {
+    this.total += amount;
   }
 
   cargarBoletasEjemplo() {
@@ -46,32 +52,6 @@ export class ListadoComponent implements OnInit {
     ];
   }
 
-  updateTotalAPagar() {
-    this.totalAPagar = this.documentosAPagar
-      .filter(doc => doc.selected)
-      .reduce((sum, doc) => sum + doc.monto, 0);
-  }
-
-  pagar() {
-    const documentosSeleccionados = this.documentosAPagar.filter(doc => doc.selected);
-    documentosSeleccionados.forEach(doc => {
-      doc.estado = 'Pagado';
-      this.boletasPagadas.push({ ...doc, selected: false });
-    });
-
-    this.documentosAPagar = this.documentosAPagar.filter(doc => !doc.selected);
-    this.updateTotalAPagar();
-    this.aplicarFiltros();
-  }
-
-  descargarPdf(url: string) {
-    window.open(url, '_blank');
-  }
-
-  buscar() {
-    this.aplicarFiltros();
-  }
-
 
   async openPdf(id: number) {
     try {
@@ -85,15 +65,6 @@ export class ListadoComponent implements OnInit {
     } catch (error) {
       console.error('There was an error opening the PDF:', error);
     }
-
-  aplicarFiltros() {
-    this.boletasPagadasFiltradas = this.boletasPagadas.filter(doc => {
-      const fechaDoc = new Date(doc.fechaEmision);
-      const cumpleFechaDesde = !this.filtroDesde || fechaDoc >= new Date(this.filtroDesde);
-      const cumpleFechaHasta = !this.filtroHasta || fechaDoc <= new Date(this.filtroHasta);
-      const cumpleEstado = !this.filtroEstado || doc.estado === this.filtroEstado;
-      return cumpleFechaDesde && cumpleFechaHasta && cumpleEstado;
-    });
 
   }
 

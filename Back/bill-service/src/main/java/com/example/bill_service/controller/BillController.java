@@ -11,6 +11,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import com.example.bill_service.client.Owner;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -43,7 +44,7 @@ public class BillController {
     }
 
 
-    // Endpoint para obtener información del propietario por ID
+    // Endpoint para oftener información del propietario por ID
     @GetMapping("/owner/{id}")
     public ResponseEntity<Owner> getOwnerById(@PathVariable Long id) {
         Owner owner = ownerService.getOwnerById(id);
@@ -81,11 +82,10 @@ public class BillController {
 
     // Endpoint para ver la boleta en formato pdf
     @CrossOrigin(origins = "http://localhost:4200")
-    @GetMapping("/bill/pdf/{id}")
-    public ResponseEntity<byte[]> generateBillPdf(@PathVariable Long id){
+    @GetMapping("/bill/pdf/{billId}")
+    public ResponseEntity<byte[]> generateBillPdf(@PathVariable Long billId){
 
-        byte[] pdfBytes = billService.generateBillPdf(id);
-
+        byte[] pdfBytes = billService.generateBillPdf(billId);
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_PDF);
 
