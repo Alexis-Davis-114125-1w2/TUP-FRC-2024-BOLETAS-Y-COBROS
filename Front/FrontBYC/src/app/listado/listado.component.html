@@ -1,85 +1,147 @@
-<div class="container mt-4">
-  <div class="row justify-content-center">
-    @if (facturaActual) {
-      <div class="col-md-6 text-center mb-4">
-        <div class="card">
+<div class="container-fluid p-0">
+  <div class="row m-0" style="background-color: #2E6A50; height: 60px;">
+    <div class="col-12 d-flex justify-content-between align-items-center">
+      <button class="btn my-btn d-lg-none ms-3" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasSidebar" aria-controls="offcanvasSidebar">
+        <i class="fas fa-bars"></i>
+      </button>
+      <h1 class="text-white mx-auto">Mis Boletas</h1>
+    </div>
+  </div>
+</div>
+
+<div class="offcanvas offcanvas-start d-lg-none" tabindex="-1" id="offcanvasSidebar" aria-labelledby="offcanvasSidebarLabel">
+  <div class="offcanvas-header">
+    <h5 class="offcanvas-title" id="offcanvasSidebarLabel">Sidebar</h5>
+    <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+  </div>
+  <div class="offcanvas-body">
+    <ul class="nav flex-column">
+      <li class="nav-item">
+        <a class="nav-link active" href="#" title="Inicio">
+          <i class="fas fa-home fw-">  Inicio</i>
+         
+        </a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="#" title="Mis Boletas">
+          <i class="fas fa-file-invoice"></i>
+        </a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="#" title="Reportes">
+          <i class="fas fa-chart-pie"></i>
+        </a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="#" title="Configuración">
+          <i class="fas fa-cog"></i>
+        </a>
+      </li>
+    </ul>
+  </div>
+</div>
+
+<div class="sidebar d-none d-lg-flex flex-column align-items-center">
+  <ul class="nav flex-column">
+    <li class="nav-item">
+      <a class="nav-link active" href="#" title="Inicio">
+        <i class="fas fa-home"></i>
+      </a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" href="#" title="Mis Boletas">
+        <i class="fas fa-file-invoice"></i>
+      </a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" href="#" title="Reportes">
+        <i class="fas fa-chart-pie"></i>
+      </a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" href="#" title="Configuración">
+        <i class="fas fa-cog"></i>
+      </a>
+    </li>
+  </ul>
+</div>
+
+
+<div class="main-content" *ngIf="boletas$ | async">
+  <div class="d-flex justify-content-center">
+    
+  <h2 style="padding: 15px;">DOCUMENTOS A PAGAR</h2>
+  
+  </div>
+  <div class="green-line"></div>
+  <h4 style="padding: 20px;">Seleccione la boleta a PAGAR : </h4>
+  <div class="row">
+    <div class="col-lg-3 col-md-4 col-sm-6 col-12 mb-3" *ngFor="let boleta of documentosAPagar">
+      <div class="card h-100">
+        <label class="w-100 h-100" style=" border-radius: 25px; min-height: 50px;"> 
+          <input type="checkbox" [(ngModel)]="boleta.selected" (change)="updateTotalAPagar()" />
           <div class="card-body">
-            <h4 class="card-title" style="color: #007bff;">Total a pagar: $ {{ facturaActual.monto | number:'1.2-2' }}</h4>
+            <h5 class="card-title">Periodo: {{ boleta.period }}</h5>
+            <p class="card-text text-danger">Vencimiento: {{ boleta.first_expiration_date }}</p>
+            <p class="card-text">${{ boleta.first_expiration_amount }}</p>
+            <button class="btn btn-primary" (click)="openPdf(boleta.id)">
+              <i class="fas fa-print"></i>
+            </button>
           </div>
-        </div>
-      </div>
-    }
-
-    <div class="col-md-12">
-      <h5 class="mb-3">Factura actual</h5>
-      <div class="table-responsive">
-        <table class="table table-bordered table-hover">
-          <thead class="table-light">
-            <tr>
-              <th>Fecha de Emisión</th>
-              <th>Periodo</th>
-              <th>Monto</th>
-              <th>Lista</th>
-              <th>Estado</th>
-              <th>Ver Boleta</th>
-              <th>Pagar</th>
-            </tr>
-          </thead>
-          <tbody>
-            @if (facturaActual) {
-              <tr>
-                <td>{{ facturaActual.fechaEmision | date:'dd/MM/yyyy' }}</td>
-                <td>{{ facturaActual.periodo }}</td>
-                <td>$ {{ facturaActual.monto | number:'1.2-2' }}</td>
-                <td>{{ facturaActual.lista }}</td>
-                <td>{{ facturaActual.estado }}</td>
-                <td><a (click)="descargarPdf()" target="_blank" class="btn btn-primary btn-sm">Ver Boleta</a></td>
-                <td><button (click)="pagar(facturaActual.urlPago)" class="btn btn-success btn-sm">Pagar</button></td>
-              </tr>
-            } @else {
-              <tr>
-                <td colspan="7" class="text-center">No hay facturas pendientes.</td>
-              </tr>
-            }
-          </tbody>
-        </table>
-      </div>
-
-      <h5 class="mt-4 mb-3">Historial de facturas pagadas</h5>
-      <div class="table-responsive">
-        <table class="table table-bordered table-hover">
-          <thead class="table-light">
-            <tr>
-              <th>Fecha de Emisión</th>
-              <th>Periodo</th>
-              <th>Monto</th>
-              <th>Lista</th>
-              <th>Estado</th>
-              <th>Ver Boleta</th>
-            </tr>
-          </thead>
-          <tbody>
-            
-            @for (boleta of boletas; track boleta.fechaEmision) {
-              <tr>
-                <td>{{ boleta.fechaEmision | date:'dd/MM/yyyy' }}</td>
-                <td>{{ boleta.periodo }}</td>
-                <td>$ {{ boleta.monto | number:'1.2-2' }}</td>
-                <td>{{ boleta.lista }}</td>
-                <td>{{ boleta.estado }}</td>
-                <td><a [href]="boleta.urlBoleta" target="_blank" class="btn btn-primary btn-sm">Ver Boleta</a></td>
-              </tr>
-            } @empty {
-              <tr>
-                <td colspan="6" class="text-center">No hay facturas pagadas.</td>
-              </tr>
-            }
-          </tbody>
-        </table>
-      </div>
-      <div class="text-end mt-3">
-        <h5>Total pagado: $ {{ totalPagado | number:'1.2-2' }}</h5>
+        </label>
       </div>
     </div>
   </div>
+
+  <div class="d-flex justify-content-between align-items-center my-4">
+    <h4>Total a Pagar: {{ totalAPagar | currency: 'USD' }}</h4>
+    <button class="btn btn-pagar" (click)="pagar()" [disabled]="totalAPagar === 0" style="width: 200px;">Pagar</button>
+  </div>
+  <div class="row" style="border-radius: 5px; color: green; border-color: green;"></div>
+  <div class="d-flex justify-content-center">
+  <h2>DOCUMENTOS PAGADOS</h2>
+  </div>
+  <div class="green-line"></div>
+  <div class="filter-container row">
+    <div class="filter-item col-lg-3 col-md-4 col-sm-12 col-12 mb-3">
+      <label for="filtroDesde">Desde:</label>
+      <input id="filtroDesde" type="date" [(ngModel)]="filtroDesde" class="form-control" />
+    </div>
+    <div class="filter-item">
+      <label for="filtroHasta">Hasta:</label>
+      <input id="filtroHasta" type="date" [(ngModel)]="filtroHasta" class="form-control" />
+    </div>
+    <div class="filter-item">
+      <label for="filtroEstado">Estado:</label>
+      <select id="filtroEstado" [(ngModel)]="filtroEstado" class="form-control">
+        <option value="">Todos</option>
+        <option value="Pago">Pagado</option>
+        <option value="Exceptuado">Exceptuado</option>
+      </select>
+    </div>
+    <div class="filter-item">
+      <label>&nbsp;</label>
+      <button class="btn btn-success form-control" (click)="buscar()">Buscar</button>
+    </div>
+  </div>
+  <table class="table table-striped table-hover">
+    <thead>
+      <tr>
+        <th>Fecha de pago</th>
+        <th>Periodo</th>
+        <th>Importe</th>
+        <th>Estado</th>
+        <th>Descargar</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let boleta of boletasPagadasFiltradas">
+        <td>{{ boleta.first_expiration_date }}</td>
+        <td>{{ boleta.period }}</td>
+        <td>${{ boleta.first_expiration_amount }}</td>
+        <td>{{ boleta.status }}</td>
+        <td><a href="#" (click)="openPdf(boleta.id)"><i class="fas fa-download download-icon"></i></a></td>
+      </tr>
+    </tbody>
+  </table>
 </div>

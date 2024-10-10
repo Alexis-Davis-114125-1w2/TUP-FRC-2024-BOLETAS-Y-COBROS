@@ -1,129 +1,101 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, Inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { DataService } from '../Service/data.service';
+import { BoletaInterface } from './boleta-interface';
+import { Observable } from 'rxjs/internal/Observable';
+import { BehaviorSubject } from 'rxjs/internal/BehaviorSubject';
+import { of } from 'rxjs/internal/observable/of';
+import { switchMap, tap } from 'rxjs/operators';
 
-interface Boleta {
-  fechaEmision: string;
-  periodo: string;
-  monto: number;
-  lista: string;
-  estado: string;
-  urlBoleta: string;
-  urlPago: string;
-}
+
 
 @Component({
   selector: 'app-listado',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, FormsModule],  
   templateUrl: './listado.component.html',
-  styleUrls: ['./listado.component.css']
+  styleUrls: ['./listado.component.css'],
 })
 export class ListadoComponent implements OnInit {
-  boletas: Boleta[] = [];
-  facturaActual: Boleta | null = null;
-  totalPagado: number = 0;
+  documentosAPagar: BoletaInterface[] = [];
+  boletasPagadas: BoletaInterface[] = [];
+  boletasPagadasFiltradas: BoletaInterface[] = [];
+  totalAPagar: number = 0;
+  filtroDesde: string = '';
+  filtroHasta: string = '';
+  filtroEstado: string = '';
+  boletas$: Observable<BoletaInterface[]> = of([]);
+  private refreshBoletas$ = new BehaviorSubject<void>(undefined);
+    
+  
+  ownerId: number = 4
+  constructor(private dataService: DataService) {
+    this.boletas$ = this.refreshBoletas$.pipe(
+      switchMap(() => this.dataService.TraerTODASboletas()),
+      tap(boletas => {
+        this.documentosAPagar = boletas.filter((boleta) => boleta.status === 'Pendiente' || boleta.status === 'Atrasado');
+        this.boletasPagadas = boletas.filter((boleta) => boleta.status === 'Pago');
+        this.updateTotalAPagar();
+        this.aplicarFiltros();
+      })
+    );
+  }
 
   ngOnInit() {
-    this.cargarBoletasEjemplo();
+    this.cargarBoletasPorUsuarioId();
+    this.aplicarFiltros();
+  }
+  IdparaProbar: number = 1;
+
+    cargarBoletasPorUsuarioId() {
+      this.refreshBoletas$.next();
+    }
+
+  
+
+  updateTotalAPagar() {
+    this.totalAPagar = this.documentosAPagar
+    .filter(doc => doc.selected)
+    .reduce((sum, doc) => sum + doc.first_expiration_amount, 0);
+}
+
+  pagar() {
+    const documentosSeleccionados = this.documentosAPagar.filter(doc => doc.selected);
+    documentosSeleccionados.forEach(doc => {
+      doc.status = 'Pago'; 
+      this.boletasPagadas.push({ ...doc, selected: false }); 
+    });
+    this.documentosAPagar = this.documentosAPagar.filter(doc => !doc.selected);
+    this.updateTotalAPagar(); 
+    this.aplicarFiltros(); 
   }
 
-  cargarBoletasEjemplo() {
-    const boletasNoPagadas: Boleta[] = [
-      {
-        fechaEmision: '2024-09-01',
-        periodo: 'Septiembre 2024',
-        monto: 5000,
-        lista: 'Expensas',
-        estado: 'No Pagado',
-        urlBoleta: 'https://ejemplo.com/boleta1',
-        urlPago: 'https://www.mercadopago.com.ar'
-      },
-      {
-        fechaEmision: '2024-08-01',
-        periodo: 'Agosto 2024',
-        monto: 4800,
-        lista: 'Expensas',
-        estado: 'No Pagado',
-        urlBoleta: 'https://ejemplo.com/boleta2',
-        urlPago: 'https://www.mercadopago.com.ar'
-      },
-      {
-        fechaEmision: '2024-07-01',
-        periodo: 'Julio 2024',
-        monto: 4600,
-        lista: 'Expensas',
-        estado: 'No Pagado',
-        urlBoleta: 'https://ejemplo.com/boleta3',
-        urlPago: 'https://www.mercadopago.com.ar'
-      }
-    ];
-
-    this.boletas = [
-      {
-        fechaEmision: '2024-06-01',
-        periodo: 'Junio 2024',
-        monto: 4400,
-        lista: 'Expensas',
-        estado: 'Pagado',
-        urlBoleta: 'https://ejemplo.com/boleta4',
-        urlPago: 'https://www.mercadopago.com.ar'
-      },
-      {
-        fechaEmision: '2024-05-01',
-        periodo: 'Mayo 2024',
-        monto: 4200,
-        lista: 'Expensas',
-        estado: 'Pagado',
-        urlBoleta: 'https://ejemplo.com/boleta5',
-        urlPago: 'https://www.mercadopago.com.ar'
-      }
-    ];
-
-    this.calcularFacturaActual(boletasNoPagadas);
-    this.calcularTotalPagado();
+  buscar() {
+    this.aplicarFiltros();
   }
 
-  calcularFacturaActual(boletasNoPagadas: Boleta[]) {
-    const totalNoPagado = boletasNoPagadas.reduce((sum, boleta) => sum + boleta.monto, 0);
-    const recargo = totalNoPagado * 0.05 * boletasNoPagadas.length;
-    const montoTotal = totalNoPagado + recargo;
-    this.facturaActual = {
-      fechaEmision: new Date().toISOString().split('T')[0],
-      periodo: 'Facturas pendientes',
-      monto: montoTotal,
-      lista: 'Expensas acumuladas',
-      estado: 'No Pagado',
-      urlBoleta: 'https://ejemplo.com/factura-actual',
-      urlPago: 'https://www.mercadopago.com.ar'
-    };
-  }
-
-  calcularTotalPagado() {
-    this.totalPagado = this.boletas.reduce((sum, boleta) => sum + boleta.monto, 0);
-  }
-
-  pagar(urlPago: string) {
-    window.open(urlPago, '_blank');
-  }
-
-
-  async descargarPdf() {
+  async openPdf(id: number) {
     try {
-      const response = await fetch(`http://localhost:8080/api/`);
+      const response = await fetch(`http://localhost:8080/api/bill/pdf/${id}`);
       if (!response.ok) {
-        throw new Error('No se pudo descargar el pdf');
+        alert("No se pudo cargar el pdf")
       }
       const blob = await response.blob();
       const url = window.URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = 'bill.pdf';
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      window.URL.revokeObjectURL(url);
+      window.open(url);
     } catch (error) {
-      console.error('Hubo un error al descargar el pdf:', error);
+      console.error('Hubo un error abriendo el PDF:', error);
     }
   }
+  aplicarFiltros() {
+    this.boletasPagadasFiltradas = this.boletasPagadas.filter(doc => {
+      const fechaDoc = new Date(doc.issueDate);
+      const cumpleFechaDesde = !this.filtroDesde || fechaDoc >= new Date(this.filtroDesde);
+      const cumpleFechaHasta = !this.filtroHasta || fechaDoc <= new Date(this.filtroHasta);
+      const cumpleEstado = !this.filtroEstado || doc.status === this.filtroEstado;
+      return cumpleFechaDesde && cumpleFechaHasta && cumpleEstado;
+    });
+  }
+
 }

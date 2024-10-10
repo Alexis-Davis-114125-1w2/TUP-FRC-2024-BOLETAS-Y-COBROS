@@ -1,0 +1,167 @@
+
+/* ------------- Estilos de la barra lateral ---------------- */
+
+.sidebar {
+    width: 60px;
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100%;
+    background-color: #41916C;
+    transition: all 0.3s;
+    z-index: 99999;
+  }
+  
+  .sidebar .nav-link {
+    text-align: center;
+    padding: 15px 0;
+    color: white;
+  }
+  
+  .sidebar .nav-link:hover {
+    background-color: #6cee8b49;
+  }
+  
+  .sidebar i {
+    font-size: 1.5rem;
+  }
+  
+  .container-fluid .row {
+    margin: 0;
+  }
+  
+  .container-fluid .row .col-12 {
+    padding: 0;
+  }
+
+  .my-btn{
+    background-color: #aec2b0;
+    border-radius: 20px;
+  }
+  .my-btn:hover{
+    background-color: #78c4a0;
+  }
+  
+  body {
+    padding-left: 60px; 
+  }
+  
+  @media (max-width: 991.98px) {
+    body {
+      padding-left: 0;
+    }
+  
+    .offcanvas-start {
+      background-color: #41916C;
+    }
+  
+    .offcanvas-start .nav-link {
+      color: white;
+    }
+  
+    .offcanvas-start .nav-link:hover {
+      background-color: #6cee8b49;
+    }
+  }
+
+  
+.main-content {
+    margin-left: 60px;
+    padding: 20px;
+}
+  
+.card {
+    box-shadow: 0 20px 35px rgba(0, 0, 0, 0.1);
+    cursor: pointer;
+    border-radius: 25px;
+       
+    position: relative; 
+    display: flex;
+    flex-direction: column;
+    transition: background-color 0.5s ease; 
+}
+.card input {
+    display: none;  
+}
+.card:active {
+    transform: translateY(10px);
+}
+
+.card input:checked + .card-body {
+    background-color: lightgreen; 
+}
+
+.card input:checked ~ .card-body {
+    background-color: lightgreen;
+}
+
+.card-body {
+    padding: 15px;
+    border-radius: inherit; 
+    transition: 0.5s ease;
+    flex-grow: 1;
+    cursor: pointer;
+    transform: translateY(-5px) translateX(1px) scale(1.04);
+    
+}
+  
+.checkbox-container {
+    position: absolute;
+    top: 5px;
+    right: 10px;
+}
+.card:hover {
+    background-color: rgb(215, 242, 215);
+    transition: 3s ; 
+    transform: translateY(5px) scale(1.02);
+}
+  
+.btn-pagar {
+    background-color: #28a745;
+    color: white;
+}
+  
+.btn-pagar:hover {
+    background-color: #218838;
+}
+  
+.filter-container {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+  
+.filter-item {
+    flex: 1;
+}
+  
+.table th {
+    background-color: #28a745;
+    color: white;
+}
+  
+.table td {
+    vertical-align: middle;
+}
+  
+.download-icon {
+    font-size: 1.5rem;
+    color: #007bff;
+}
+  
+.download-icon:hover {
+    color: #0056b3;
+}
+
+.green-line {
+    width: 100%;
+    height: 5px; 
+    background-color: lightgreen;
+    margin: 10px 0; 
+    border-radius: 45%;
+  }
+  hr.dark-line {
+    border: 1px solid #6e6e6e;
+    margin-top: 10px;
+    margin-bottom: 20px;
+  }

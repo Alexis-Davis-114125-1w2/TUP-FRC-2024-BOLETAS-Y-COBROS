@@ -4,6 +4,7 @@ import { InicioComponent } from './inicio/inicio.component';
 import { RouterModule } from '@angular/router';
 import { routes } from './app.routes';
 import { ListadoComponent } from './listado/listado.component';
+import { HttpClient, HttpClientModule } from '@angular/common/http';
 
 @Component({
   selector: 'app-root',
@@ -11,7 +12,7 @@ import { ListadoComponent } from './listado/listado.component';
   imports: [
     RouterOutlet
     , InicioComponent
-    , ListadoComponent],
+    , ListadoComponent, HttpClientModule],
   templateUrl: './app.component.html',
   styleUrl: './app.component.css'
 })
