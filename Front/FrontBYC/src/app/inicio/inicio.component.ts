@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
+import { PagarBoletaComponent } from '../pagar-boleta/pagar-boleta.component';
 
 import { ListadoComponent } from '../listado/listado.component';
 
@@ -8,7 +9,7 @@ import { ListadoComponent } from '../listado/listado.component';
   standalone : true,
   templateUrl: './inicio.component.html',
   styleUrls: ['./inicio.component.css'],
-  imports: [ ListadoComponent]
+  imports: [ ListadoComponent, PagarBoletaComponent]
 })
 
 export class InicioComponent {
@@ -18,6 +19,13 @@ export class InicioComponent {
   }
   irAConsultarPagosHistoricos() {
     this.router.navigate(['/consultar-pagos-historicos']);
+  
+  }
+
+  status: boolean = true;
+
+  reciveStatus(status: boolean){
+    this.status = status;
   }
 }
 
