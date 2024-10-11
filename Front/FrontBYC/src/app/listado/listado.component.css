@@ -42,9 +42,9 @@
   
 
 
-
 hr.dark-line {
-    border: 1px solid #5f5f5f;
+    border: 50% solid #5f5f5f;
     margin-top: 10px;
     margin-bottom: 20px;
+    height: 2px;
   }

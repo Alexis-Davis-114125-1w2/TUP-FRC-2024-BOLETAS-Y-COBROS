@@ -38,7 +38,7 @@ export class ListadoComponent implements OnInit {
   getExpensesByOwner() {
     this.unpaidExpenses$ = this.service.getExpenseByOwner(this.ownerId)
   }
-
+  
 
   recieveAmount(amount: number) {
     this.total += amount;

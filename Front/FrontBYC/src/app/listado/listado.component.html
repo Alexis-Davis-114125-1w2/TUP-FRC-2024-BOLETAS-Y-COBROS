@@ -5,14 +5,15 @@
   <hr class="my-3 dark-line" />
 
   <div class="row">
-    @for (item of unpaidExpenses$ |async; track $index) {
-
-    <div class="col-12 col-md-4">
-      <app-expense-card [billDueDate]="item.first_expiration_date" [billAmount]="item.first_expiration_amount"
-        (sendAmount)="recieveAmount($event)" />
-    </div>
+    @for (item of unpaidExpenses$ | async; track item.id) {
+      <div class="col-12 col-md-4">
+        <app-expense-card 
+          [billDueDate]="item.first_expiration_date" 
+          [billAmount]="item.first_expiration_amount"
+          [billId]="item.id"
+          (sendAmount)="recieveAmount($event)" />
+      </div>
     }
-
   </div>
 
   <div class="d-flex justify-content-between align-items-center my-4">

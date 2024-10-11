@@ -19,7 +19,7 @@ export class ExpenseCardComponent {
   overdue: boolean = false;
   status: boolean = false;
   periodo: string = "";
-
+  isChecked: boolean = false;
 
   ngOnInit() {
     this.periodo = this.calculatePeriod();
@@ -29,7 +29,10 @@ export class ExpenseCardComponent {
       this.overdue = true;
     }
   }
-
+  onCheckboxChange(event: Event) {
+    this.isChecked = (event.target as HTMLInputElement).checked;
+    this.newAmount();
+  }
 
   // METODO QUE TE CALCULA EL PERIODO DE LA BOLETA SEGUN LA FECHA DE VENCIMIENTO
 
@@ -73,6 +76,7 @@ export class ExpenseCardComponent {
       this.sendAmount.emit(-this.billAmount);
       this.status = false;
     }
+    console.log('Checkbox state changed:', this.isChecked);
   }
 
 

@@ -16,13 +16,7 @@ export class ClientServiceService {
 
 
   getExpenseByOwner(ownerId: number): Observable<ExpenseInterface[]> {
-    return this.http.get<ExpenseInterface[]>(`${this.ApiBaseUrl}${ownerId}/ownerId?owner_id=${ownerId}`);
+    return this.http.get<ExpenseInterface[]>(`${this.ApiBaseUrl}all?owner_id=${ownerId}`);
   }
-  getAllExpenses(): Observable<any[]> {
-    return this.http.get<ExpenseInterface[]>(`${this.ApiBaseUrl}all`);
-  }
-
-  getExpensesByFilter(status: string): Observable<ExpenseInterface[]> {
-    return this.http.get<ExpenseInterface[]>(`${this.ApiBaseUrl}${status}/status`);
-  }
+  
 }
