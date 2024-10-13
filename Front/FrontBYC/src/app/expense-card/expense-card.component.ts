@@ -1,6 +1,8 @@
 import { Component } from '@angular/core';
 import { Input, Output, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { ClientServiceService } from '../module/client-service.service';
+import { ExpenseInterface } from '../expense-interface';
 
 @Component({
   selector: 'app-expense-card',
@@ -11,35 +13,30 @@ import { CommonModule } from '@angular/common';
 })
 export class ExpenseCardComponent {
 
-  @Input() billAmount: number = 0;
-  @Input() billDueDate: string = "";
-  @Input() billId: number = 0;
-  @Output() sendAmount = new EventEmitter<number>();
-  @Output() sendId = new EventEmitter<number>();
+  @Input() expense!: ExpenseInterface;
 
   overdue: boolean = false;
   status: boolean = false;
   periodo: string = "";
 
 
-  ngOnInit() {
-    this.periodo = this.calculatePeriod();
+  constructor(public expenses: ClientServiceService){}
 
+
+  ngOnInit() {
     // SI LA FECHA DE VENCIMIENTO ES MENOR A LA FECHA ACTUAL, LA BOLETA ESTA VENCIDA
-    if (this.billDueDate !== null && this.billDueDate !== undefined && this.billDueDate < new Date().toISOString()) {
+    if (this.expense.first_expiration_date !== null && this.expense.first_expiration_date !== undefined && this.expense.first_expiration_date < new Date().toISOString()) {
       this.overdue = true;
     }
+
+    console.log(this.expense)
+
+  
   }
 
 
   // METODO QUE TE CALCULA EL PERIODO DE LA BOLETA SEGUN LA FECHA DE VENCIMIENTO
 
-  calculatePeriod(): string {
-    let date = new Date(this.billDueDate);
-    let month = date.getMonth();
-    let year = date.getFullYear();
-    return `${month}/${year}`;
-  }
 
 
 
@@ -65,14 +62,15 @@ export class ExpenseCardComponent {
 
   // METODO QUE ENVIA EL MONTO DE LA BOLETA AL COMPONENT PADRE
 
-   newAmount() {
+   selectExpense() {
     if (this.status === false) {
-      this.sendAmount.emit(this.billAmount);
-      this.sendId.emit( this.billId );
+      this.expenses.addSelectedExpense(this.expense);
+    //  console.log(this.expenses.getSelectedExpenses());
+      
       this.status = true;
     } else {
-      this.sendAmount.emit(-this.billAmount);
-      this.sendId.emit( this.billId );
+      this.expenses.removeSelectedExpense( this.expense.id);
+     // console.log(this.expenses.getSelectedExpenses());
       this.status = false;
     }
   }

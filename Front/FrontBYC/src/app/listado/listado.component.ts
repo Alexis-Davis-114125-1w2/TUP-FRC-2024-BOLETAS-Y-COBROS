@@ -24,25 +24,27 @@ export class ListadoComponent implements OnInit {
 
   }
 
+
+  // Arreglos
   expenses$!: Observable<ExpenseInterface[]>;
+  selectedExpenses: ExpenseInterface[] = [];
   paidExpenses: ExpenseInterface[] = [];
   unpaidExpenses: ExpenseInterface[] = [];
-  selectedExpenses: ExpenseInterface[] = [];
+
+  // Filtros
   filtroDesde: string = '';
   filtroHasta: string = '';
   filtroEstado: string = '';
+
+  // Variables
   total: number = 0;
   ownerId: number = 3;
   @Output() status = new EventEmitter<number>() ;
 
   ngOnInit() {
     this.getExpensesByOwner();
-
-    this.selectedExpenses.forEach(expense => {
-      this.service.addSelectedExpense(expense)
-    })
-
-
+    this.selectedExpenses = this.service.getSelectedExpenses();
+    console.log(this.selectedExpenses)
   }
 
 
@@ -56,26 +58,11 @@ export class ListadoComponent implements OnInit {
 
 
  
-  recieveAmount(amount: number) {
-    this.total += amount;
+  calculateTotal() {
+    this.total = this.selectedExpenses.reduce((sum, expense) => sum + expense.first_expiration_amount, 0);
+
   }
 
-  recieveId(id: number) {
-    const expense = this.unpaidExpenses.find(expense => expense.id === id);
-    if (expense) {
-      const index = this.selectedExpenses.findIndex(exp => exp.id === id);
-      if (index > -1) {
-        this.selectedExpenses.splice(index, 1); 
-      } else {
-        this.selectedExpenses.push(expense);
-       
-      }
-
-      console.log(this.selectedExpenses);
-    } else {
-      console.error(`Expense with id ${id} not found`);
-    }
-  }
 
 
 

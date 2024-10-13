@@ -33,5 +33,9 @@ export class ClientServiceService {
   }
 
 
+  removeSelectedExpense(id: number){
+    this.selectedExpenses = this.selectedExpenses.filter(expense => expense.id !== id)
+  }
+
 
 }

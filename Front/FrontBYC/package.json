@@ -19,8 +19,10 @@
     "@angular/platform-browser-dynamic": "^18.2.0",
     "@angular/router": "^18.2.0",
     "@stripe/stripe-js": "^4.8.0",
+    "@types/pdfmake": "^0.2.9",
     "bootstrap": "^5.3.3",
     "mercadopago": "^2.0.15",
+    "pdfmake": "^0.2.14",
     "rxjs": "~7.8.0",
     "tslib": "^2.3.0",
     "zone.js": "~0.14.10"

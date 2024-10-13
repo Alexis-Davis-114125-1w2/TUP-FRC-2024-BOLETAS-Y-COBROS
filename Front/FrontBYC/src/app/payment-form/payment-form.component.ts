@@ -5,6 +5,9 @@ import { ExpenseInterface } from '../expense-interface';
 import { ClientServiceService } from '../module/client-service.service';
 import { Observable } from 'rxjs';
 import { CheckoutServiceService } from '../checkout-service.service';
+import { Stripe, loadStripe } from '@stripe/stripe-js';
+
+
 
 @Component({
   selector: 'app-payment-form',
@@ -19,31 +22,75 @@ export class PaymentFormComponent implements OnInit {
 
   @Output() status = new EventEmitter<number>()
   @Input() paymentMethod: number = 0;
+  @Input() billInfo: ExpenseInterface[] = [];
   total: number = 0;
   dni: string = '';
+
+  stripe!: Stripe | null;
+  cardElement!: any;
   
-  expensesToPay$!: Observable<ExpenseInterface[]>;
+
   expensesToPayy: ExpenseInterface[] = [];
   paymentIntentId: string = "";
   clientSecret: string = "";
 
-  ngOnInit(): void {
-    this.expensesToPay$ = this.expenseService.getExpenseByOwner(3);
-    this.expensesToPay$.subscribe(expenses => {
-      this.expensesToPayy = expenses;
-      this.calculateTotal();
-    });
-    this.calculateTotal;
+ 
+
+  async ngOnInit() {
+    this.expensesToPayy = this.expenseService.getSelectedExpenses();
+    this.calculateTotal();
+
+  
+    this.stripe = await loadStripe('pk_test_51Q9KeeAo8TVLkLHfGUC1qB0HlSy0ZRit3MOTmmwUUn2BiKf5odgFYtmQHfYAlsNN2hbHCtYMJrU3DiV2OZcFl3t000qNZ2evGC');
+    if (this.stripe) {
+      const elements = this.stripe.elements();
+      this.cardElement = elements.create('card', {
+        style: {
+          base: {
+            color: '#32325d',
+            fontSize: '19px',
+            padding: '5px',
+            fontFamily: "'Helvetica Neue', Helvetica, sans-serif",
+            fontWeight: '400',
+            lineHeight: '24px',
+
+            '::placeholder': { color: '#aab7c4' },
+          },
+          invalid: {
+            color: '#fa755a',
+            iconColor: '#fa755a',
+          },
+         
+        },
+      });
+      this.cardElement.mount('#card-element');
+    } else {
+      console.error("Stripe no se pudo inicializar");
+    }
   }
 
+  async onSubmit() {
+    if (this.stripe) {
+      const result = await this.stripe.createToken(this.cardElement);
+      if (result.error) {
+        console.error(result.error.message);
+      } else {
+        console.log(result.token);
+      }
+    }
+  }
+
+
+
+
+
   calculateTotal(){
-    this.expensesToPay$.forEach(element => {
+    
       this.expensesToPayy.forEach(element => {
         for (let index = 0; index < this.expensesToPayy.length; index++) {
           this.total += element.first_expiration_amount
         }
       });
-    });
   }
 
   

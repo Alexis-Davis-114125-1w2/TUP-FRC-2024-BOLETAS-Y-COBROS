@@ -15,8 +15,7 @@
 
 
     <div class="col-12 col-md-6">
-      <app-expense-card [billDueDate]="item.first_expiration_date" [billAmount]="item.first_expiration_amount"
-        [billId]="item.id" (sendAmount)="recieveAmount($event)" (sendId)="recieveId($event)" />
+      <app-expense-card  [expense]="item" />
     </div>
     }
     }
@@ -74,8 +73,6 @@
   </div>
 
   </div>
-
-
 
 
 
