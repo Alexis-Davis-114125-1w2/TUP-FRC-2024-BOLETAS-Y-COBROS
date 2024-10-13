@@ -1,7 +1,6 @@
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
-import { PagarBoletaComponent } from '../pagar-boleta/pagar-boleta.component';
-
+import { PaymentFormComponent } from '../payment-form/payment-form.component';
 import { ListadoComponent } from '../listado/listado.component';
 
 @Component({
@@ -9,7 +8,7 @@ import { ListadoComponent } from '../listado/listado.component';
   standalone : true,
   templateUrl: './inicio.component.html',
   styleUrls: ['./inicio.component.css'],
-  imports: [ ListadoComponent, PagarBoletaComponent]
+  imports: [ ListadoComponent, PaymentFormComponent]
 })
 
 export class InicioComponent {
@@ -22,9 +21,9 @@ export class InicioComponent {
   
   }
 
-  status: boolean = true;
+  status: number = 1;
 
-  reciveStatus(status: boolean){
+  reciveStatus(status: number){
     this.status = status;
   }
 }

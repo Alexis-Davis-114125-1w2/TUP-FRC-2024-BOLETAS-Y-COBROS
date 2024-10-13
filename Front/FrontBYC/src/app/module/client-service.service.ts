@@ -9,20 +9,29 @@ import { ExpenseInterface } from '../expense-interface';
 export class ClientServiceService {
 
   public i = 1;
-  private ApiBaseUrl = "http://localhost:8080/api/expenses/";
+  private ApiBaseUrl = "http://localhost:8080/api/expenses";
   constructor(private http: HttpClient) {
 
   }
 
 
   getExpenseByOwner(ownerId: number): Observable<ExpenseInterface[]> {
-    return this.http.get<ExpenseInterface[]>(`${this.ApiBaseUrl}${ownerId}/ownerId?owner_id=${ownerId}`);
-  }
-  getAllExpenses(): Observable<any[]> {
-    return this.http.get<ExpenseInterface[]>(`${this.ApiBaseUrl}all`);
+    return this.http.get<ExpenseInterface[]>(`${this.ApiBaseUrl}/all?owner_id=${ownerId}`);
   }
 
-  getExpensesByFilter(status: string): Observable<ExpenseInterface[]> {
-    return this.http.get<ExpenseInterface[]>(`${this.ApiBaseUrl}${status}/status`);
+
+
+  selectedExpenses: ExpenseInterface[] = []
+
+  addSelectedExpense(expense: ExpenseInterface){
+    this.selectedExpenses.push(expense)
   }
+
+
+  getSelectedExpenses() {
+    return this.selectedExpenses;
+  }
+
+
+
 }

@@ -1,2 +1,9 @@
-
-<app-listado></app-listado>
+ 
+ 
+ @if(status == 1){
+     <app-listado  (status)="reciveStatus($event)"/>
+    
+ }
+ @else {
+      <app-payment-form  (status)="reciveStatus($event)" [paymentMethod]="status"/>
+ }

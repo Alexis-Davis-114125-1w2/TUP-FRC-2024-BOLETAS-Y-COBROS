@@ -1,8 +1,6 @@
 import { Component } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { InicioComponent } from './inicio/inicio.component'; 
-import { RouterModule } from '@angular/router';
-import { routes } from './app.routes';
 import { ListadoComponent } from './listado/listado.component';
 
 @Component({
@@ -11,10 +9,11 @@ import { ListadoComponent } from './listado/listado.component';
   imports: [
     RouterOutlet
     , InicioComponent
-    , ListadoComponent],
+    , ListadoComponent
+    ],
   templateUrl: './app.component.html',
   styleUrl: './app.component.css'
 })
 export class AppComponent {
-  title = 'FrontBYC';
+  title = 'Boletas';
 }

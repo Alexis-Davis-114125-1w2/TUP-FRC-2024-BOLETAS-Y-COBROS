@@ -15,6 +15,7 @@ export class ExpenseCardComponent {
   @Input() billDueDate: string = "";
   @Input() billId: number = 0;
   @Output() sendAmount = new EventEmitter<number>();
+  @Output() sendId = new EventEmitter<number>();
 
   overdue: boolean = false;
   status: boolean = false;
@@ -46,9 +47,9 @@ export class ExpenseCardComponent {
 
   async openPdf(id: number) {
     try {
-      const response = await fetch(`http://localhost:8080/api/bill/pdf/${id}`);
+      const response = await fetch(`http://localhost:8080/api/expenses/pdf/${id}`);
       if (!response.ok) {
-        throw new Error('Network response was not ok');
+        alert("No se pudo cargar el pdf")
       }
       const blob = await response.blob();
       const url = window.URL.createObjectURL(blob);
@@ -56,6 +57,7 @@ export class ExpenseCardComponent {
     } catch (error) {
       console.error('There was an error opening the PDF:', error);
     }
+
   }
 
 
@@ -63,14 +65,14 @@ export class ExpenseCardComponent {
 
   // METODO QUE ENVIA EL MONTO DE LA BOLETA AL COMPONENT PADRE
 
-  newAmount() {
-
+   newAmount() {
     if (this.status === false) {
       this.sendAmount.emit(this.billAmount);
+      this.sendId.emit( this.billId );
       this.status = true;
-    }
-    else {
+    } else {
       this.sendAmount.emit(-this.billAmount);
+      this.sendId.emit( this.billId );
       this.status = false;
     }
   }

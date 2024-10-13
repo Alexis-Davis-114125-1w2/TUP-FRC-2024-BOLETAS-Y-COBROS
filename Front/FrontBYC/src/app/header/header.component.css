@@ -4,7 +4,6 @@
   top: 0;
   left: 0;
   height: 100%;
-  background-color: #41916C;
   transition: all 0.3s;
   z-index: 99999;
   display: flex;
@@ -59,11 +58,12 @@
 }
 
 .nav-link-sm:hover {
-  background-color: #78c4a0; 
+  background-color: #acb3b0; 
+  color: black;
 }
 
 .nav-link:hover {
-  background-color: #2b2c2be0;
+  background-color: #b6bbb6e0;
   width: 240px; 
   border-radius: 0px 20px 20px 0px;
 }
@@ -98,7 +98,7 @@
 }
 
 .my-btn:hover {
-  background-color: #78c4a0;
+  background-color: #bbcac3;
 }
 
 body {
@@ -110,16 +110,14 @@ body {
     padding-left: 0;
   }
 
-  .offcanvas-start {
-    background-color: #41916C;
-  }
+ 
 
   .offcanvas-start .nav-link {
     color: white;
   }
 
   .offcanvas-start .nav-link:hover {
-    background-color: #a4e9b449;
+    background-color: #b5b8b649;
   }
 
   .nav-link {
@@ -144,7 +142,8 @@ body {
 /* Estilos para pantallas grandes */
 @media (min-width: 992px) {
   .nav-link:hover {
-    background-color: #2b2c2be0;
+    background-color: #909192e0;
+    color: rgb(0, 0, 0);
     width: 240px; 
     border-radius: 0px 20px 20px 0px;
   }
