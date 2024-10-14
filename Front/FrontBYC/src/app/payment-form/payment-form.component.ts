@@ -137,10 +137,25 @@ export class PaymentFormComponent implements OnInit {
     if (!response?.clientSecret) {
       throw new Error("No se recibió clientSecret del backend");
     }
+    this.paymentIntentId = response.paymentIntentId;
     return response;
   }
 
 
+  async openPdf() {
+    try {
+      const response = await fetch(`http://localhost:8020/generate-receipt/${this.paymentIntentId}`);
+      if (!response.ok) {
+        alert("No se pudo cargar el pdf")
+      }
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      window.open(url);
+    } catch (error) {
+      console.error('There was an error opening the PDF:', error);
+    }
+
+  }
 
 
   downloadReceipt() {
