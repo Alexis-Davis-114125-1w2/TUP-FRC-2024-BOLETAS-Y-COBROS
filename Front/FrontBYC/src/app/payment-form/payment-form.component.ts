@@ -3,8 +3,9 @@ import {FormBuilder, FormGroup, ReactiveFormsModule, Validators} from '@angular/
 import { ExpenseInterface } from '../expense-interface';
 import { ClientServiceService } from '../module/client-service.service';
 import { CheckoutServiceService } from '../checkout-service.service';
-import { Stripe, loadStripe, StripeCardElement } from '@stripe/stripe-js';
+import { loadStripe, Stripe, StripeCardElement } from '@stripe/stripe-js';
 import {CurrencyPipe, DatePipe, NgClass, NgFor, NgIf, NgSwitch, NgSwitchCase, NgSwitchDefault} from "@angular/common";
+import {firstValueFrom} from "rxjs";
 
 @Component({
   selector: 'app-payment-form',
@@ -31,13 +32,13 @@ export class PaymentFormComponent implements OnInit {
 
   paymentForm: FormGroup;
   total: number = 0;
-  stripe!: Stripe | null;
-  cardElement!: StripeCardElement;
+  stripe: Stripe | null = null;
+  cardElement: StripeCardElement | null = null;
 
   expensesToPay: ExpenseInterface[] = [];
   paymentIntentId: string = "";
   clientSecret: string = "";
-  error: string | undefined = '';
+  error: string = '';
   paymentStatusMessage: string = '';
   processing: boolean = false;
   paymentSuccessful: boolean = false;
@@ -57,7 +58,7 @@ export class PaymentFormComponent implements OnInit {
     this.expensesToPay = this.expenseService.getSelectedExpenses();
     this.total = this.expensesToPay.reduce((sum, expense) => sum + expense.first_expiration_amount, 0);
 
-    this.stripe = await loadStripe('pk_test_51Q9KeeAo8TVLkLHfGUC1qB0HlSy0ZRit3MOTmmwUUn2BiKf5odgFYtmQHfYAlsNN2hbHCtYMJrU3DiV2OZcFl3t000qNZ2evGC');
+    this.stripe = await loadStripe('pk_test_51Q3iwwRwJDdlWggbw9AqW6ETZEuj0aRgDME6NdDAbamdDihYRdK4k0G1dbR3IPNYqm3k2vt1tCpIJKrQ85IR8rNE00mGz2BoE9');
     if (this.stripe) {
       const elements = this.stripe.elements();
       this.cardElement = elements.create('card', {
@@ -73,44 +74,30 @@ export class PaymentFormComponent implements OnInit {
           invalid: { color: '#fa755a', iconColor: '#fa755a' },
         },
         hidePostalCode: true,
-      }) as StripeCardElement;
+      });
       this.cardElement.mount('#card-element');
     } else {
       console.error("Stripe no se pudo inicializar");
     }
   }
 
-
   async onSubmit() {
-    if (this.paymentForm.invalid || !this.stripe) {
+    if (this.paymentForm.invalid || !this.stripe || !this.cardElement) {
       return;
     }
-
     this.processing = true;
     this.error = '';
 
     try {
-      // Crear el PaymentMethod primero
-      const { paymentMethod, error } = await this.stripe.createPaymentMethod({
-        type: 'card',
-        card: this.cardElement,
-        billing_details: {
-          name: this.paymentForm.get('cardHolderName')?.value,
-        },
-      });
-
-      if (error) {
-        throw new Error(error.message);
+      const paymentIntentResponse = await this.createPaymentIntent();
+      if (!paymentIntentResponse) {
+        throw new Error("Error: No se recibió clientSecret");
       }
 
-      // Ahora tienes el paymentMethodId si lo necesitas
-      const paymentMethodId = paymentMethod.id;
+      const { clientSecret } = paymentIntentResponse;
 
-      // Crear el PaymentIntent
-      const paymentIntentResult = await this.createPaymentIntent(paymentMethodId);
-
-      // Confirmar el pago usando el clientSecret recibido
-      const result = await this.stripe.confirmCardPayment(this.clientSecret, {
+      // Confirmación del pago usando el clientSecret
+      const result = await this.stripe.confirmCardPayment(clientSecret, {
         payment_method: {
           card: this.cardElement,
           billing_details: {
@@ -120,11 +107,11 @@ export class PaymentFormComponent implements OnInit {
       });
 
       if (result.error) {
-        throw new Error(result.error.message);
-      } else if (result.paymentIntent.status === 'succeeded') {
-        this.paymentStatusMessage = 'Pago realizado con éxito';
-        this.paymentSuccessful = true;
+        throw new Error(result.error.message || "Error al confirmar el pago");
       }
+
+      this.paymentSuccessful = true;
+      this.paymentStatusMessage = "Pago realizado con éxito";
     } catch (err: any) {
       console.error("Error en el proceso de pago:", err);
       this.error = err.message || "Error al procesar el pago";
@@ -133,42 +120,27 @@ export class PaymentFormComponent implements OnInit {
     }
   }
 
-  async createPaymentIntent(paymentMethodId: any): Promise<any> {
+
+  async createPaymentIntent(): Promise<{ clientSecret: string } | undefined> {
     const currency = 'ars';
-    const paymentMethodType = 'card';
     const cardHolderName = this.paymentForm.get('cardHolderName')?.value;
     const dni = this.paymentForm.get('dni')?.value;
-
     const requestBody = {
       amount: this.total,
       currency: currency,
-      paymentMethodType: paymentMethodType,
-      paymentMethodId: paymentMethodId, // Añade esto si lo tienes
       cardHolderName: cardHolderName,
-      dni: dni,
-      confirm: false,
-      returnUrl: `${window.location.origin}/payment-result`,
+      dni: dni
     };
 
-    return new Promise((resolve, reject) => {
-      this.checkout.createPaymentIntent(requestBody).subscribe({
-        next: response => {
-          if (response && response.clientSecret) {
-            this.paymentIntentId = response.paymentIntentId;
-            this.clientSecret = response.clientSecret;
-            console.log('Payment Intent created:', response);
-            resolve(response);
-          } else {
-            reject(new Error('Invalid response from server'));
-          }
-        },
-        error: err => {
-          console.error('Error creating Payment Intent:', err);
-          reject(err);
-        }
-      });
-    });
+    // Llamada al servicio con la nueva configuración
+    const response = await this.checkout.createPaymentIntent(requestBody).toPromise();
+    if (!response?.clientSecret) {
+      throw new Error("No se recibió clientSecret del backend");
+    }
+    return response;
   }
+
+
 
 
   downloadReceipt() {
