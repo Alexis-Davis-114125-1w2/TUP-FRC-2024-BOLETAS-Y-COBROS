@@ -4,7 +4,6 @@
   top: 0;
   left: 0;
   height: 100%;
-  background-color: #495057;
   transition: all 0.3s;
   z-index: 99999;
   display: flex;
