@@ -1,46 +1,62 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
-import { FormsModule } from '@angular/forms';
-import { CommonModule } from '@angular/common';
+import {FormBuilder, FormGroup, ReactiveFormsModule, Validators} from '@angular/forms';
 import { ExpenseInterface } from '../expense-interface';
 import { ClientServiceService } from '../module/client-service.service';
-import { Observable } from 'rxjs';
 import { CheckoutServiceService } from '../checkout-service.service';
-import { Stripe, loadStripe } from '@stripe/stripe-js';
-
-
+import { Stripe, loadStripe, StripeCardElement } from '@stripe/stripe-js';
+import {CurrencyPipe, DatePipe, NgClass, NgFor, NgIf, NgSwitch, NgSwitchCase, NgSwitchDefault} from "@angular/common";
 
 @Component({
   selector: 'app-payment-form',
-  standalone: true,
-  imports: [CommonModule, FormsModule],
   templateUrl: './payment-form.component.html',
+  standalone: true,
+  imports: [
+    ReactiveFormsModule,
+    NgClass,
+    DatePipe,
+    CurrencyPipe,
+    NgFor,
+    NgIf,
+    NgSwitch,
+    NgSwitchCase,
+    NgSwitchDefault
+
+  ],
   styleUrls: ['./payment-form.component.css']
 })
 export class PaymentFormComponent implements OnInit {
-
-  constructor(public expenseService: ClientServiceService, public checkout: CheckoutServiceService) { }
-
-  @Output() status = new EventEmitter<number>()
+  @Output() status = new EventEmitter<number>();
   @Input() paymentMethod: number = 0;
   @Input() billInfo: ExpenseInterface[] = [];
+
+  paymentForm: FormGroup;
   total: number = 0;
-  dni: string = '';
-
   stripe!: Stripe | null;
-  cardElement!: any;
-  
+  cardElement!: StripeCardElement;
 
-  expensesToPayy: ExpenseInterface[] = [];
+  expensesToPay: ExpenseInterface[] = [];
   paymentIntentId: string = "";
   clientSecret: string = "";
+  error: string | undefined = '';
+  paymentStatusMessage: string = '';
+  processing: boolean = false;
+  paymentSuccessful: boolean = false;
 
- 
+  constructor(
+    private formBuilder: FormBuilder,
+    public expenseService: ClientServiceService,
+    public checkout: CheckoutServiceService
+  ) {
+    this.paymentForm = this.formBuilder.group({
+      cardHolderName: ['', Validators.required],
+      dni: ['', Validators.required]
+    });
+  }
 
   async ngOnInit() {
-    this.expensesToPayy = this.expenseService.getSelectedExpenses();
-    this.calculateTotal();
+    this.expensesToPay = this.expenseService.getSelectedExpenses();
+    this.total = this.expensesToPay.reduce((sum, expense) => sum + expense.first_expiration_amount, 0);
 
-  
     this.stripe = await loadStripe('pk_test_51Q9KeeAo8TVLkLHfGUC1qB0HlSy0ZRit3MOTmmwUUn2BiKf5odgFYtmQHfYAlsNN2hbHCtYMJrU3DiV2OZcFl3t000qNZ2evGC');
     if (this.stripe) {
       const elements = this.stripe.elements();
@@ -49,85 +65,130 @@ export class PaymentFormComponent implements OnInit {
           base: {
             color: '#32325d',
             fontSize: '19px',
-            padding: '5px',
             fontFamily: "'Helvetica Neue', Helvetica, sans-serif",
             fontWeight: '400',
             lineHeight: '24px',
-
-            '::placeholder': { color: '#aab7c4' },
+            '::placeholder': { color: '#aab7c4' }
           },
-          invalid: {
-            color: '#fa755a',
-            iconColor: '#fa755a',
-          },
+          invalid: { color: '#fa755a', iconColor: '#fa755a' },
         },
-        hidePostalCode : true,
-      });
+        hidePostalCode: true,
+      }) as StripeCardElement;
       this.cardElement.mount('#card-element');
     } else {
       console.error("Stripe no se pudo inicializar");
     }
   }
 
+
   async onSubmit() {
-    if (this.stripe) {
-      const result = await this.stripe.createToken(this.cardElement);
-      if (result.error) {
-        console.error(result.error.message);
-      } else {
-        console.log(result.token);
+    if (this.paymentForm.invalid || !this.stripe) {
+      return;
+    }
+
+    this.processing = true;
+    this.error = '';
+
+    try {
+      // Crear el PaymentMethod primero
+      const { paymentMethod, error } = await this.stripe.createPaymentMethod({
+        type: 'card',
+        card: this.cardElement,
+        billing_details: {
+          name: this.paymentForm.get('cardHolderName')?.value,
+        },
+      });
+
+      if (error) {
+        throw new Error(error.message);
       }
+
+      // Ahora tienes el paymentMethodId si lo necesitas
+      const paymentMethodId = paymentMethod.id;
+
+      // Crear el PaymentIntent
+      const paymentIntentResult = await this.createPaymentIntent(paymentMethodId);
+
+      // Confirmar el pago usando el clientSecret recibido
+      const result = await this.stripe.confirmCardPayment(this.clientSecret, {
+        payment_method: {
+          card: this.cardElement,
+          billing_details: {
+            name: this.paymentForm.get('cardHolderName')?.value,
+          },
+        },
+      });
+
+      if (result.error) {
+        throw new Error(result.error.message);
+      } else if (result.paymentIntent.status === 'succeeded') {
+        this.paymentStatusMessage = 'Pago realizado con éxito';
+        this.paymentSuccessful = true;
+      }
+    } catch (err: any) {
+      console.error("Error en el proceso de pago:", err);
+      this.error = err.message || "Error al procesar el pago";
+    } finally {
+      this.processing = false;
     }
   }
 
+  async createPaymentIntent(paymentMethodId: any): Promise<any> {
+    const currency = 'ars';
+    const paymentMethodType = 'card';
+    const cardHolderName = this.paymentForm.get('cardHolderName')?.value;
+    const dni = this.paymentForm.get('dni')?.value;
 
+    const requestBody = {
+      amount: this.total,
+      currency: currency,
+      paymentMethodType: paymentMethodType,
+      paymentMethodId: paymentMethodId, // Añade esto si lo tienes
+      cardHolderName: cardHolderName,
+      dni: dni,
+      confirm: false,
+      returnUrl: `${window.location.origin}/payment-result`,
+    };
 
-
-
-
-
-  calculateTotal(){
-    
-      this.expensesToPayy.forEach(element => {
-        for (let index = 0; index < this.expensesToPayy.length; index++) {
-          this.total += element.first_expiration_amount
+    return new Promise((resolve, reject) => {
+      this.checkout.createPaymentIntent(requestBody).subscribe({
+        next: response => {
+          if (response && response.clientSecret) {
+            this.paymentIntentId = response.paymentIntentId;
+            this.clientSecret = response.clientSecret;
+            console.log('Payment Intent created:', response);
+            resolve(response);
+          } else {
+            reject(new Error('Invalid response from server'));
+          }
+        },
+        error: err => {
+          console.error('Error creating Payment Intent:', err);
+          reject(err);
         }
       });
-  }
-
-  
-
-  createPaymentIntent() {
-    this.checkout.createPaymentIntent(this.total).subscribe(response => {
-      this.paymentIntentId = response.paymentIntentId;
-      this.clientSecret = response.clientSecret;
-      console.log('Payment Intent created:', response);
-      alert('Payment Intent created:'+ response);
-      this.confirmPayment(this.paymentIntentId)
-    }, error => {
-      console.error('Error creating Payment Intent:', error);
-      alert('Error creating Payment Intent:'+ error);
     });
   }
 
-  confirmPayment(intentId: string) {
-    this.checkout.confirmPayment(this.paymentIntentId).subscribe(response => {
-      console.log('Payment confirmed:', response);
-      alert('Payment confirmed:'+ response);
-    }, error => {
-      console.error('Error confirming Payment:', error);
-      alert('Error confirming Payment:' + error);
+
+  downloadReceipt() {
+    this.checkout.generateReceipt(this.paymentIntentId).subscribe({
+      next: (pdfBytes: ArrayBuffer) => {
+        const blob = new Blob([pdfBytes], { type: 'application/pdf' });
+        const link = document.createElement('a');
+        link.href = window.URL.createObjectURL(blob);
+        link.download = 'receipt.pdf';
+        link.click();
+      },
+      error: err => {
+        console.error('Error generating receipt:', err);
+        this.error = 'Error al generar el comprobante';
+      }
     });
   }
 
-// cuando toque el boton volver tiene que limpiar la lista de facturas seleccionadas
-  goBack(){
+  goBack() {
     this.expenseService.clearSelectedExpenses();
-    this.sendStatus();
+    this.status.emit(1);
   }
-  
-  sendStatus(){
-    this.status.emit(1)
-  }
- 
 }
