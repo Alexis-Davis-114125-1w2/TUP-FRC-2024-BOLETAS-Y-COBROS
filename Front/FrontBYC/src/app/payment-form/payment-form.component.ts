@@ -60,8 +60,8 @@ export class PaymentFormComponent implements OnInit {
             color: '#fa755a',
             iconColor: '#fa755a',
           },
-         
         },
+        hidePostalCode : true,
       });
       this.cardElement.mount('#card-element');
     } else {
@@ -79,6 +79,8 @@ export class PaymentFormComponent implements OnInit {
       }
     }
   }
+
+
 
 
 
@@ -118,6 +120,11 @@ export class PaymentFormComponent implements OnInit {
     });
   }
 
+// cuando toque el boton volver tiene que limpiar la lista de facturas seleccionadas
+  goBack(){
+    this.expenseService.clearSelectedExpenses();
+    this.sendStatus();
+  }
   
   sendStatus(){
     this.status.emit(1)

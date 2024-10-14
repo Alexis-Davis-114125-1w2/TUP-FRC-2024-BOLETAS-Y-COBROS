@@ -32,8 +32,12 @@ export class ListadoComponent implements OnInit {
   unpaidExpenses: ExpenseInterface[] = [];
 
   // Filtros
-  filtroDesde: string = '';
-  filtroHasta: string = '';
+  startDate: string = '';
+  endDate: string = '';
+
+  minStartDate: string = '';
+  minEndDate: string = '';
+
   filtroEstado: string = '';
 
   // Variables
@@ -42,10 +46,15 @@ export class ListadoComponent implements OnInit {
   @Output() status = new EventEmitter<number>() ;
 
   ngOnInit() {
+
+    const today = new Date();
+
     this.getExpensesByOwner();
     this.selectedExpenses = this.service.getSelectedExpenses();
     console.log(this.selectedExpenses)
   }
+
+ 
 
 
   getExpensesByOwner() {
@@ -59,7 +68,7 @@ export class ListadoComponent implements OnInit {
 
  
   calculateTotal() {
-    this.total = this.selectedExpenses.reduce((sum, expense) => sum + expense.first_expiration_amount, 0);
+       this.total = this.selectedExpenses.reduce((sum, expense) => sum + expense.first_expiration_amount, 0);
 
   }
 

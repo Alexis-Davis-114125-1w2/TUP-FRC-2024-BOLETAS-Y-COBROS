@@ -27,6 +27,9 @@ export class ClientServiceService {
     this.selectedExpenses.push(expense)
   }
 
+  clearSelectedExpenses() {
+    this.selectedExpenses = [];
+  }
 
   getSelectedExpenses() {
     return this.selectedExpenses;
